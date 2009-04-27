@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<actionMappings>
+	<!-- when the request is "", find the action with the below name -->
+	<defaultAction name="Home" />
+	
+	<!-- common results that do not change across actions -->
+	<globalResults>
+		<result name="ERROR">error</result>
+		<result name="JSON">json</result>
+		<result name="IMG">img</result>
+	</globalResults>
+	
+	<!-- templates to render page within, add template=TEMPLATE_NAME to an action def to use -->
+	<templates>
+		<template name="default" path="templates.default" />
+	</templates>
+	
+	<!-- common sets of required permissions for an action, may appear more than once in an action def, additive -->
+	<permissionGroups>
+		<permissionGroup name="default">
+			<permisison name="view" />
+		</permissionGroup>
+		<permissionGroup name="authorized">
+			<permisison name="view" />
+		</permissionGroup>
+		<permissionGroup name="admin">
+			<permisison name="view" />
+			<permisison name="update" />
+			<permisison name="delete" />
+		</permissionGroup>
+	</permissionGroups>
+	
+	<!-- action definitions, must have a name to refer to by, dot separated path to class def -->
+	<!-- if no action class def, try to just do view -->
+	<!-- @type - type of action, may be "page", "json", "dispatcher"
+		"page" renderes a page in markup and requires a valid view def
+		"json" renders assembled data as json notation using a standard json serialization
+		"dispatcher" requires that you redirect to another action after completing the work if the given action
+	-->
+	<!-- @view - location of php file to render the view. this should have access to public methods of the action and base action -->
+	
+	<actions>
+		<action name="Home" path="Home" type="page" view="pages.home" template="default">
+			<permissionGroup name="default" />
+			<permissions>
+				<permisison name="update" />
+				<permission name="delete" />
+			</permissions>
+			<results>
+				<result name="STATIC_CONTENT" type="redirect">actual_location</result>
+				<result name="ERROR" type="action">Error</result>
+				<result name="ALT_VIEW">pages.misc.testPage</result>
+				<result name="JSON" type="json" />
+			</results>
+		</action>
+		<action name="Contact" path="Contact" type="page" view="pages.contact" template="default">
+			<permissionGroup name="default" />
+			<permissions>
+				<permisison name="update" />
+				<permission name="delete" />
+			</permissions>
+			<results>
+				<result name="STATIC_CONTENT" type="redirect">actual_location</result>
+				<result name="ERROR" type="action">Error</result>
+				<result name="ALT_VIEW">pages.misc.testPage</result>
+				<result name="JSON" type="json" />
+			</results>
+		</action>
+		<action name="OtherHome" classPath="Home" type="json" view="pages.home">
+			<permissionGroup name="default" />
+			<permissions>
+				<permisison name="update" />
+				<permission name="delete" />
+			</permissions>
+			<results>
+				<result name="SUCCESS" type="redirect">actual_location</result>
+				<result name="SUCCESS" type="action">action</result>
+				<result name="TEST_1" type="render">viewLocation</result>
+				<result name="TEST_2">viewLocation</result>
+			</results>
+		</action>
+	</actions>
+</actionMappings>

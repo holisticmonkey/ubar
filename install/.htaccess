@@ -1,0 +1,19 @@
+#disable directory listing and follow sim links
+Options -Indexes FollowSymLinks
+
+# remap action request to controller
+RewriteEngine  On
+RewriteRule ^[^/]+\.action$ /index.php [NE,L]
+
+#default location
+DirectoryIndex index.php
+
+#hide framework files
+<Files .htaccess>
+	order allow,deny
+	deny from all
+</Files>
+<Files ubar.conf>
+	order allow,deny
+	deny from all
+</Files>
