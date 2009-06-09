@@ -1,11 +1,10 @@
 <?php
 
+
 // TODO: make this abstract?
 // TODO: make action interface
 // TODO: have method that declares function defs so they're avail to page? do just before rendering page
 class ActionManager {
-
-	const DEFAULT_TYPE = "page";
 
 	private $actionLocation;
 	private $actionClassName;
@@ -13,18 +12,13 @@ class ActionManager {
 	private $permissions;
 	private $results;
 	private $className;
-	private $type;
 	private $template;
 
 	public function __construct($actionXML) {
 		$this->actionLocation = FileUtils :: dotToPath((string) $actionXML['path']);
 		$this->template = (string) $actionXML['template'];
 		$this->actionClassName = FileUtils :: classFromFile((string) $actionXML['path']);
-		$this->type = is_null($actionXML['type']) ? DEFAULT_TYPE : (string) $actionXML['type'];
-		// TODO: have types be enum or at least constants
-		if ($this->type == "page") {
-			$this->viewLocation = FileUtils :: dotToPath((string) $actionXML['view']);
-		}
+		$this->viewLocation = FileUtils :: dotToPath((string) $actionXML['view']);
 		$this->results = $actionXML->results;
 		$this->permissionGroup = $actionXML->permissionGroup;
 		$this->permissions = $actionXML->permissions;
@@ -41,10 +35,6 @@ class ActionManager {
 
 	public function getViewLocation() {
 		return $this->viewLocation;
-	}
-
-	public function getType() {
-		return $this->type;
 	}
 
 	public function getClassName() {
@@ -80,8 +70,6 @@ class ActionManager {
 		// json - get json parent object and convert to json, do header conversion etc
 		return null;
 	}
-
-	
 
 }
 ?>

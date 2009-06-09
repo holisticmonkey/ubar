@@ -47,7 +47,7 @@ class Dispatcher {
 		// verify that action exists
 		$actionRealPath = BASE_ACTION_PATH . $actionDef->getActionLocation();
 		if (!file_exists($actionRealPath)) {
-			throw new ActionNotFoundException($actionRealPath);
+			throw new ActionNotFoundException($actionDef->getActionLocation());
 		} else {
 			require_once ($actionRealPath);
 		}
@@ -72,7 +72,7 @@ class Dispatcher {
 		// if still no result definiton, fail
 
 		// before rendering, make sure localized properties are avail
-		//TODO: consider moving this 
+		//TODO: consider moving this
 
 		// if there's a view, try to render it
 		if ($hasView && ($resultDef == null || $resultDef->getType() == "page" || $resultDef->getType() == null)) {
@@ -80,7 +80,7 @@ class Dispatcher {
 			$templateName = $actionDef->getTemplate();
 			if (!Str :: nullOrEmpty($templateName)) {
 				$templatePath = $this->actionMapper->getTemplate($templateName);
-				// is there a template def with the given name? no? fatal 
+				// is there a template def with the given name? no? fatal
 				if (is_null($templatePath)) {
 					die("the referenced template \"" . $templatePath . "\" does not exist where the template name was $templateName.");
 				}
@@ -88,35 +88,18 @@ class Dispatcher {
 				if (!file_exists($templateRealPath)) {
 					die("the template file \"" . $templateRealPath . "\" does not exist");
 				}
+				// templates must call renderBody() in order to retrieve page content
 				require_once ($templateRealPath);
 
 				// just render the view
 			} else {
 				$this->renderBody();
 			}
-			// TODO: instead of requring here, allow render inside template with simple call to renderBody() or similar
-
 		}
-
-		//} catch (Exception $e) {
-		//die();
-		// action not found - try to send to error page
-		//}
-		// create new instance of action class
-		// attempt to populate with get and post params
-		// if no method override, use "execute"
-		// lookup result for action def
-
-		// if doesn't match, look for error action def
-
-		// if error action def not found, return 404
-		//echo $actionString;
 	}
 
-	
-
 	// TODO: consider only allowing calling once, moving to Action
-	public function renderBody() {		
+	public function renderBody() {
 		require_once ($this->view);
 	}
 }

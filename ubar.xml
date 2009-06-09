@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE actionMappings SYSTEM "ubar.dtd">
 
 <actionMappings>
 	<!-- when the request is "", find the action with the below name -->
@@ -19,15 +20,15 @@
 	<!-- common sets of required permissions for an action, may appear more than once in an action def, additive -->
 	<permissionGroups>
 		<permissionGroup name="default">
-			<permisison name="view" />
+			<permission name="view" />
 		</permissionGroup>
 		<permissionGroup name="authorized">
-			<permisison name="view" />
+			<permission name="view" />
 		</permissionGroup>
 		<permissionGroup name="admin">
-			<permisison name="view" />
-			<permisison name="update" />
-			<permisison name="delete" />
+			<permission name="view" />
+			<permission name="update" />
+			<permission name="delete" />
 		</permissionGroup>
 	</permissionGroups>
 	
@@ -41,44 +42,33 @@
 	<!-- @view - location of php file to render the view. this should have access to public methods of the action and base action -->
 	
 	<actions>
-		<action name="Home" path="Home" type="page" view="pages.home" template="default">
+		<action name="Home" path="Home" view="pages.home" template="default">
 			<permissionGroup name="default" />
 			<permissions>
-				<permisison name="update" />
+				<permission name="update" />
 				<permission name="delete" />
 			</permissions>
 			<results>
-				<result name="STATIC_CONTENT" type="redirect">actual_location</result>
+				<result name="STATIC_CONTENT" type="url">http://www.skylist.net</result>
 				<result name="ERROR" type="action">Error</result>
 				<result name="ALT_VIEW">pages.misc.testPage</result>
 				<result name="JSON" type="json" />
 			</results>
 		</action>
-		<action name="Contact" path="Contact" type="page" view="pages.contact" template="default">
+		<action name="Contact" path="Contact" view="pages.contact" template="default">
 			<permissionGroup name="default" />
 			<permissions>
-				<permisison name="update" />
+				<permission name="update" />
 				<permission name="delete" />
 			</permissions>
 			<results>
-				<result name="STATIC_CONTENT" type="redirect">actual_location</result>
 				<result name="ERROR" type="action">Error</result>
 				<result name="ALT_VIEW">pages.misc.testPage</result>
 				<result name="JSON" type="json" />
 			</results>
 		</action>
-		<action name="OtherHome" classPath="Home" type="json" view="pages.home">
-			<permissionGroup name="default" />
-			<permissions>
-				<permisison name="update" />
-				<permission name="delete" />
-			</permissions>
-			<results>
-				<result name="SUCCESS" type="redirect">actual_location</result>
-				<result name="SUCCESS" type="action">action</result>
-				<result name="TEST_1" type="render">viewLocation</result>
-				<result name="TEST_2">viewLocation</result>
-			</results>
-		</action>
+		<!-- update to no path meaning that result is automatically SUCCESS -->
+		<action name="Resume" path="Resume" view="pages.resume" template="default" />
+		<action name="Blog" path="Blog" view="pages.blog" template="default" />
 	</actions>
 </actionMappings>

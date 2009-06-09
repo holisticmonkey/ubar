@@ -10,8 +10,13 @@ class ActionMapper {
 	// TODO: make parsing failure be more graceful and provide meaningful feedback
 	function __construct($file) {
 		// convert xml of action definitions to an xml object
-		// TODO: do real xml parsing that uses DTD
-		$actionDefsXML = simplexml_load_file($file);
+		libxml_clear_errors();
+		//$actionDefsXML = simplexml_load_file($file, "SimpleXMLElement", LIBXML_DTDVALID);
+$actionDefsXML = simplexml_load_file($file);
+		if (libxml_get_last_error()) {
+			die('Error validating / loading XML');
+		}
+
 
 		// get the name of the default action
 		$this->defaultActionName = (string) $actionDefsXML->defaultAction['name'];
@@ -27,6 +32,9 @@ class ActionMapper {
 
 		// assign permission groups as a local variable
 		$this->templates = $actionDefsXML->templates->template;
+
+		//print_r($this);
+		//die("die!!!");
 	}
 
 	public function getAction($actionName) {
