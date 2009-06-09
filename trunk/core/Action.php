@@ -1,15 +1,22 @@
 <?php
 class Action {
-	
+
+	// valid return values
+	const SUCCESS = "success";
+
+	const ERROR = "error";
+
+	const JSON = "json";
+
 	private $properties;
-	
+
 	private $locale;
 
 	public function __construct($viewPath) {
 		global $action, $view;
 		$action = $this;
 		$view = $viewPath;
-		
+
 		function get($methodName) {
 			global $action;
 			//var_dump($action);
@@ -23,18 +30,18 @@ class Action {
 			//$args = func_num_args();
 			return $action->getProperties()->get($key, $arguments, DEV_MODE);
 		}
-		
+
 		function renderBody() {
 			global $view;
-			require_once($view);	
+			require_once($view);
 		}
 	}
-	
+
 	protected function setUserLocale($locale) {
 		$this->locale = $locale;
 		$this->properties = null;
 	}
-	
+
 	public function getProperties() {
 		if(is_null($this->properties)) {
 			$this->properties = new LocalizedProperties($this->locale);
@@ -56,6 +63,6 @@ class Action {
 		}
 		throw new Exception("method \"" . $original . "\" was not found in the action");
 	}
-	
+
 }
 ?>
