@@ -1,6 +1,6 @@
 <?
 class Str {
-	// TODO: make everything static
+
 	public static function nullOrEmpty($var, $countWhitespace = false) {
 		// if null or not initialized, return true
 		if (!isset ($var) || is_null($var)) {
@@ -59,5 +59,7 @@ class Str {
 		}
 		return $message;
 	}
+
+	// add stripNewlines(), see Properties
 }
 ?>

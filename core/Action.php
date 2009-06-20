@@ -1,12 +1,6 @@
 <?php
-class Action {
-
-	// valid return values
-	const SUCCESS = "success";
-
-	const ERROR = "error";
-
-	const JSON = "json";
+// TODO: abstract or interface? depending on implementation.
+abstract class Action {
 
 	private $properties;
 
@@ -63,6 +57,8 @@ class Action {
 		}
 		throw new Exception("method \"" . $original . "\" was not found in the action");
 	}
+
+	public abstract function execute();
 
 }
 ?>

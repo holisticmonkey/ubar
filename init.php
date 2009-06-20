@@ -2,51 +2,27 @@
 # ALLOW INITIALIZATION OF CLASSES
 // TODO: consider having ubar_resources.properties for error messages and similar
 
-// get files allowed to be auto loaded
-function getClassPaths($directory, $recursive = FALSE) {
-	global $classes;
 
-	$dir = opendir($directory);
-	while ($entry = readdir($dir)) {
-		if ($entry != "." && $entry != ".." && !(strstr($entry, '.svn') > -1)) {
-			$file = $directory . '/' . $entry;
-			if (is_dir($file) && $recursive) {
-				getClassPaths($file, $recursive);
-			}
-			elseif (is_file($file) && (substr($file, strlen($file) - 4, 4) == '.php')) {
-				$classes[$entry] = $directory . '\\' . $entry;
-			}
-		}
-	}
-}
 
-// get path of current file since classes should be relative to here
-define('UBAR_ROOT', dirname(__FILE__) . "/");
-
-// allow the following folders of classes to be auto-loaded
-getClassPaths(UBAR_ROOT . "constants", TRUE);
-getClassPaths(UBAR_ROOT . "exception", TRUE);
-getClassPaths(UBAR_ROOT . "core", TRUE);
-
-// magic auto-loader function that tries to load classes that are in the allowed list
-// TODO: allow user to specify an autoload directory
-function __autoload($className) {
-	global $classes;
-	$filename = $className . ".php";
-	if (isset ($classes[$filename])) {
-		require_once ($classes[$filename]);
-	} else {
-		throw new Exception("Failed to autoload class \"$className\".");
-		// log that failed to find class through auto-loading
-	}
+// test cases call this directly instead of through index.php so need to define root
+if(!defined('UBAR_ROOT')) {
+	define('UBAR_ROOT', dirname(__FILE__) . "/");
 }
 
 // include functions
 // TODO: require everything the functions folder?
-require_once (UBAR_ROOT . "functions/misc.php");
+require_once (UBAR_ROOT . "/functions/misc.php");
+
+// allow the following folders of classes to be auto-loaded
+getClassPaths(UBAR_ROOT . "/constants", TRUE);
+getClassPaths(UBAR_ROOT . "/exception", TRUE);
+getClassPaths(UBAR_ROOT . "/core", TRUE);
 
 # GET PROPERTIES
-$props = new Properties(UBAR_ROOT . "ubar_config.properties");
+if(!defined('UBAR_CONFIG_PATH')) {
+	define('UBAR_CONFIG_PATH', null);
+}
+$props = new Properties(UBAR_CONFIG_PATH, true);
 
 # DEFINE CONSTANTS FROM PROPERTIES FILE
 // get dev mode first to know which property name to use
@@ -62,38 +38,20 @@ define('MAGIC_QUOTES', $props->getBool('MAGIC_QUOTES', GlobalConstants :: MAGIC_
 define('SESSION_LIFETIME', $props->get('SESSION_LIFETIME', GlobalConstants :: SESSION_LIFETIME));
 define('CHARSET', $props->get('CHARSET', GlobalConstants :: CHARSET));
 define('USE_XHTML', $props->getBool('USE_XHTML', GlobalConstants :: USE_XHTML));
-define('PROPERTIES_PATH', $props->get('PROPERTIES_PATH'. PROP_APPEND, ''));
+define('PROPERTIES_PATH', UBAR_ROOT . "/" . $props->get('PROPERTIES_PATH' . PROP_APPEND, GlobalConstants :: BASE_PROPERTIES_PATH));
 define('PROPERTIES_ROOT', $props->get('PROPERTIES_ROOT', GlobalConstants :: PROPERTIES_ROOT));
 
 // try to define base action path and base view path from configuration
-$testBaseActionPath = $props->get('BASE_ACTION_PATH'. PROP_APPEND, '');
-$testBaseViewPath = $props->get('BASE_VIEW_PATH'. PROP_APPEND, '');
-// define BASE_ACTTION_PATH
-if($testBaseActionPath != '') {
-	$relativeBaseActionPath = WEB_ROOT . $testBaseActionPath;
-	if(is_dir($relativeBaseActionPath)) {
-		define('BASE_ACTION_PATH', $relativeBaseActionPath);
-	} elseif(is_dir($testBaseActionPath)) {
-		define('BASE_ACTION_PATH', $testBaseActionPath);
-	} else {
-		die("Unable to find specified action root path at \"" . $testBaseActionPath . "\" or \"" . $testBaseActionPath . "\".");
-	}
-	getClassPaths(BASE_ACTION_PATH, TRUE);
-} else {
-	define('BASE_ACTION_PATH', '');
+// note, defaults to expected installation struction
+define('BASE_ACTION_PATH', UBAR_ROOT . "/" . $props->get('BASE_ACTION_PATH' . PROP_APPEND, GlobalConstants :: BASE_ACTION_PATH));
+if (!is_dir( BASE_ACTION_PATH)) {
+	die("Unable to find specified action root path at \"" . BASE_ACTION_PATH . "\"." . " File: " . __FILE__ . " on line: " . __LINE__);
 }
-// define BASE_VIEW_PATH
-if($testBaseViewPath != '') {
-	$relativeBaseViewPath = WEB_ROOT . $testBaseViewPath;
-	if(is_dir($relativeBaseViewPath)) {
-		define('BASE_VIEW_PATH', $relativeBaseViewPath);
-	} elseif(is_dir($testBaseViewPath)) {
-		define('BASE_VIEW_PATH', $testBaseViewPath);
-	} else {
-		die("Unable to find specified view root path at \"" . $relativeBaseViewPath . "\" or \"" . $testBaseViewPath . "\".");
-	}
-} else {
-	define('BASE_VIEW_PATH', '');
+getClassPaths(BASE_ACTION_PATH, TRUE);
+
+define('BASE_VIEW_PATH', UBAR_ROOT . "/" . $props->get('BASE_VIEW_PATH' . PROP_APPEND, GlobalConstants :: BASE_VIEW_PATH));
+if (!is_dir(BASE_VIEW_PATH)) {
+	die("Unable to find specified view root path at \"" . BASE_VIEW_PATH . "\"." . " File: " . __FILE__ . " on line: " . __LINE__);
 }
 
 // define default timezone
@@ -192,7 +150,9 @@ if(isset($_SESSION['userID'])) {
 // get from user if present and set
 // default if no value or value from user not valid
 // TODO: consider moving this to controller and allowing project to override?
-date_default_timezone_set(TIMEZONE_DEFAULT);
+if (defined('TIMEZONE_DEFAULT')) {
+	date_default_timezone_set(TIMEZONE_DEFAULT);
+}
 
 # set locale
 // TODO: consider moving this to controller and allowing project to override?
@@ -215,9 +175,5 @@ define('LOCALE', $currentLocale);
 
 // set up localized properties? pick up from session since may be from user settings?
 
-// get action definitions
-$dispatcher = new Dispatcher(UBAR_ROOT . "ubar.xml");
 
-// not that framework is setup, let the controller dispatch the request
-$dispatcher->dispatch();
 ?>

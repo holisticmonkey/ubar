@@ -13,7 +13,3 @@ DirectoryIndex index.php
 	order allow,deny
 	deny from all
 </Files>
-<Files ubar.conf>
-	order allow,deny
-	deny from all
-</Files>

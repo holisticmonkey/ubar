@@ -1,4 +1,5 @@
 <?php
-class SubmitAction extends Action {
-	
+abstract class SubmitAction extends Action {
+
 }
+?>
