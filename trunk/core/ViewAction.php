@@ -1,5 +1,5 @@
 <?php
-class ViewAction extends Action {
+abstract class ViewAction extends Action {
 
 	private $exception;
 
@@ -27,3 +27,4 @@ class ViewAction extends Action {
 		return $this->section;
 	}
 }
+?>

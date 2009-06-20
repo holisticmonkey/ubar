@@ -11,8 +11,7 @@ class ActionMapper {
 	function __construct($file) {
 		// convert xml of action definitions to an xml object
 		libxml_clear_errors();
-		//$actionDefsXML = simplexml_load_file($file, "SimpleXMLElement", LIBXML_DTDVALID);
-$actionDefsXML = simplexml_load_file($file);
+		$actionDefsXML = simplexml_load_file($file, "SimpleXMLElement", LIBXML_DTDVALID);
 		if (libxml_get_last_error()) {
 			die('Error validating / loading XML');
 		}

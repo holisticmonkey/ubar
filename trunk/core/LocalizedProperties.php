@@ -43,7 +43,7 @@ class LocalizedProperties {
 
 		// verify directory found
 		if (!file_exists($path)) {
-			die('Path \'' . $path . '\' to properties files does not exist.');
+			die ("Path \" $path \" to properties files does not exist. File: " . __FILE__ . " on line: " . __LINE__);
 		}
 
 		// get locale

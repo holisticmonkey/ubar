@@ -68,6 +68,7 @@ class Dispatcher {
 		if ($resultDef == null && $resultString != "SUCCESS") {
 			// look for it in global defs
 			debug("looking for " . $resultString . " in global results");
+			// TODO: find def
 		}
 		// if still no result definiton, fail
 
@@ -75,6 +76,7 @@ class Dispatcher {
 		//TODO: consider moving this
 
 		// if there's a view, try to render it
+		// TODO: figure out why not doing more with resultDef
 		if ($hasView && ($resultDef == null || $resultDef->getType() == "page" || $resultDef->getType() == null)) {
 			// is there a template referenced to render the view inside?
 			$templateName = $actionDef->getTemplate();
