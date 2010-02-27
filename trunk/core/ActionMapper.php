@@ -13,9 +13,8 @@ class ActionMapper {
 		libxml_clear_errors();
 		$actionDefsXML = simplexml_load_file($file, "SimpleXMLElement", LIBXML_DTDVALID);
 		if (libxml_get_last_error()) {
-			die('Error validating / loading XML');
+			throw new Exception('Error validating / loading XML');
 		}
-
 
 		// get the name of the default action
 		$this->defaultActionName = (string) $actionDefsXML->defaultAction['name'];
@@ -31,26 +30,39 @@ class ActionMapper {
 
 		// assign permission groups as a local variable
 		$this->templates = $actionDefsXML->templates->template;
-
-		//print_r($this);
-		//die("die!!!");
 	}
 
 	public function getAction($actionName) {
 		foreach ($this->actions as $action) {
 			if ((string) $action['name'] == $actionName) {
-				return new ActionManager($action);
+				return new ActionDef($action);
 			}
 		}
 		// TODO: make more specific exception
-		//throw new ActionNotFoundException($actionString);
+		//throw new ActionNotDefinedException($actionString);
 		throw new Exception("No action definition was found with the name \"" . $actionName . "\".");
 	}
 
+	// TODO: make template errors indicate process for resolution like dot path stuff
 	public function getTemplate($templateName) {
+		$returnTemplate = null;
 		foreach ($this->templates as $template) {
 			if ((string) $template['name'] == $templateName) {
-				return FileUtils :: dotToPath((string) $template['path']);
+				$templateDef = new TemplateDef($template);
+
+				// if extends other template, use that path
+				if (!is_null($template['extends'])) {
+					$extendedTemplate = $this->getTemplate($template['extends']);
+
+					// merge defs
+					if (is_null($templateDef->getPath())) {
+						$templateDef->setPath($extendedTemplate->getPath());
+					}
+					foreach ($extendedTemplate->getParams() as $name => $value) {
+						$templateDef->addParam($name, $value);
+					}
+				}
+				return $templateDef;
 			}
 		}
 		return null;

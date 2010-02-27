@@ -3,7 +3,7 @@
 Simple expression processing on message bundle messages based on OGNL syntax.
 */
 class OGNL {
-/* 
+/*
 RULES:
 {0} replace with first element in arguments
 {asdf} replace with whatever element of arguments that has 'asdf' for key iin argument array
@@ -18,12 +18,12 @@ RULES:
 //TODO: determine what happens when a nested directive fails to be substituted because no matching argument found
 //TODO: determine what should happen when string is empty
 //TODO: cache results in case same thing is being called a bunch of times - example, lookup for link lable displayed on every line of a record set
-	
+
 	// multiline, extra analysis, utf-8, ungreedy
 	// regex to get smallest ognl directive match that doesn't contain another directive - used iteratively to allow for nested directives
 		// ex. {0,choice,0#dogs|1#dog|1<dogs}
 	const replaceRegex = '/{([^{,]+)(,[^{]*){0,1}}/mSuU';
-	
+
 	// regex to split choice instructions into component parts - compare value, comparator, resulting condition
 		// ex. 0#dogs|1#dog|1<dogs
 	const choiceRegex = '/([^#><\|]+)([#><]{1})([^\|]*)/mSu';
@@ -37,10 +37,10 @@ RULES:
 			if(!is_array($arguments)) {
 				$arguments = array($arguments);
 			}
-			
+
 			// array of directives to ignore because no matching argument found
 			$ignoreList = array();
-			
+
 			// while you find something that looks like a directive, try to process it
 			while(preg_match(self::replaceRegex, $string, $match)) {
 				// get the key which should match an argument
@@ -49,7 +49,7 @@ RULES:
 				$value = NULL;
 				// directive instructions - math, choice, number formatting, etc
 				$instructions = NULL;
-				
+
 				// key not found in arguments
 				if(!array_key_exists($key, $arguments)) {
 					// replace unrecognized directive with marker so the while loop doesn't get caught on it again<br />
@@ -60,12 +60,12 @@ RULES:
 				} else {
 					$value = $arguments[$key];
 				}
-				
+
 				// get instruction portion of directive - may be empty
 				if(isset($match[2])) {
 					$instructions = trim(substr($match[2], 1));
 				}
-				
+
 				// if empty, just replace value
 				if(Str::nullOrEmpty($instructions)) {
 					$string = str_replace($match[0], $value, $string);
@@ -80,13 +80,13 @@ RULES:
 					}
 				}
 			}
-			
+
 			// if any replace markers for directives with bad keys, put them back now
 			foreach($ignoreList as $key => $value) {
 				// NOTE: since expression language creates parse errors in xhtml and may otherwise impact markup, escaping characters in string.
 				$string = str_replace($key, htmlspecialchars($value), $string);
 			}
-			
+
 			// return string now that all directives with associated arguments are replaced
 			// TODO: in dev mode, check that there weren't any missed directives because no argument found to match
 		} catch (Exception $e) {
@@ -96,20 +96,20 @@ RULES:
 		}
 		return $string;
 	}
-	
+
 	// ignore a directive because it was invalid or does not have a matching argument
 	private static function ignore($invalidExpression, &$ignoreList, &$string) {
 		$replaceMarker = 'OGNL_MARKER_' . count($ignoreList) .  '_OGNL_MARKER';
 		$string = str_replace($invalidExpression, $replaceMarker, $string);
 		$ignoreList[$replaceMarker] = $invalidExpression;
 	}
-	
+
 	// try to evaluate expression of directive
 	private static function processValue($value, $instructions) {
 		$returnString = NULL;
 		$type = NULL;
 		$modifiers = NULL;
-		
+
 		$end = stripos($instructions, ',');
 		// if there's no comma, treat the whole string as the type
 		if(!$end) {
@@ -123,18 +123,18 @@ RULES:
 
 		// format value based on instructions - may convert to locale formatted number, date, or do basic string logic like plurality
 		switch ($type) {
-		
+
 		case "number":
 			// TODO: do a switch on modifier for float, decimal, money, etc
 				// use money_format() for formatting money in the Str class
-			$returnString = Str::strToInt($value);
+			$returnString = Str::formatNumber($value);
 			break;
-			
+
 		case "choice":
 			// TODO: support boolean comparison on each choice
 			// TODO: warning if doing numeric operation on something no numeric when in dev mode
 			// TODO: figure out how do do ranges and more complex conditions - is this accomplished by most difficult match with < and >?
-			
+
 			// split choice conditions into component parts
 			preg_match_all(self::choiceRegex, $modifiers, $matches);
 			// holders of max and min values in > < comparisons so that the most extreme matches win if more than one
@@ -145,7 +145,7 @@ RULES:
 				$comparator = $matches[2][$index];
 				$result = $matches[3][$index];
 				switch($comparator) {
-				
+
 				// equality
 				case "#":
 					if($compareValue == $value) {
@@ -154,7 +154,7 @@ RULES:
 					// equality is the trump card and wins over > <
 					continue;
 					break;
-					
+
 				// value is less than compareValue
 				case ">":
 					if($compareValue > $value) {
@@ -165,7 +165,7 @@ RULES:
 						}
 					}
 					break;
-					
+
 				// value greater than compareValue
 				case "<":
 					if($compareValue < $value) {
@@ -176,17 +176,17 @@ RULES:
 						}
 					}
 					break;
-					
+
 				// not yet suppoprted comparator
 				default:
 					// TODO: only die in dev mode
-					die("unsupported comparator \"" . $comparator . "\".");
+					throw new Exception("unsupported comparator \"" . $comparator . "\".");
 					continue;
 					break;
 				}
 			}
 			break;
-			
+
 		// do date formatting. note that this should be locale specific
 		case "date":
 			// if not timestamp, try to make one
@@ -198,7 +198,7 @@ RULES:
 			case "duration":
 				// convert to duration like "5 weeks, 3 days ago" or "68 seconds from now"
 			case "verbose":
-				// 
+				//
 			case "normal":
 				// just fall through to default
 			default:
@@ -213,13 +213,13 @@ RULES:
 			// TODO: support math functions that aren't described by arithmetic operators such as min, max, floor, ceiling
 			// currently allowed tokens to be found in modifier string. note that open and close tags are required to tokenize string properly
 			$allowedTokens = array(T_OPEN_TAG, T_CLOSE_TAG, T_LNUMBER, T_WHITESPACE);
-			
+
 			// get tokens from modifier string
 			$tokens = token_get_all('<?php ' . $modifiers . ' ?>');
-			
+
 			// flag for whether the modifier string is safe to eval
 			$safe = TRUE;
-			
+
 			// make sure there's no risky code in the string
 			foreach($tokens as $token) {
 				// if this is a token and it's not in the allowed list, throw a warning
@@ -234,10 +234,10 @@ RULES:
 				eval("\$returnString = $value $modifiers;");
 			}
 			break;
-			
+
 		default:
 			// TODO: only die in dev mode
-			die("unsupported directive type \"" . $type . "\".");
+			throw new Exception("unsupported directive type \"" . $type . "\".");
 			continue;
 			break;
 		}

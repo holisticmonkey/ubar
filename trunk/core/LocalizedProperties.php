@@ -43,7 +43,7 @@ class LocalizedProperties {
 
 		// verify directory found
 		if (!file_exists($path)) {
-			die ("Path \" $path \" to properties files does not exist. File: " . __FILE__ . " on line: " . __LINE__);
+			throw new Exception("Path \" $path \" to properties files does not exist. File: " . __FILE__ . " on line: " . __LINE__);
 		}
 
 		// get locale
@@ -58,7 +58,7 @@ class LocalizedProperties {
 		// make sure that default properties file exists
 		$defaultPath = $path . $this->propertiesPrepender . $this->propertiesAppender;
 		if (!file_exists($defaultPath)) {
-			die('Default properties file \'' . $defaultPath . '\' does not exist.');
+			throw new Exception('Default properties file \'' . $defaultPath . '\' does not exist.');
 		}
 
 		// if this is the default locale or there was no override, set default as main properties
@@ -71,7 +71,7 @@ class LocalizedProperties {
 			$localizedPath = $path . $this->propertiesPrepender . "_" . $this->locale . $this->propertiesAppender;
 			// if localized file doesn't exist, set default as primary and log that couldn't find localized property file
 			if (!file_exists($localizedPath)) {
-				//die('Properties file \'' . $propertiesPath . '\' does not exist.');
+				//throw new Exception('Properties file \'' . $propertiesPath . '\' does not exist.');
 				// log that couldn't find locale specific properties
 				$this->properties = $this->defaultProperties;
 				// get localized properties file

@@ -68,6 +68,9 @@ class GlobalConstants {
 	# DEFAULT ACTION - default action to load if not found in ubar_config
 	const DEFAULT_ACTION = 'default';
 
+	# DUMMY_ACTION - class name for dummy action when no class specified
+	const DUMMY_ACTION = 'DummyAction';
+
 	# ROOT NAME OF PROPS FILE - root name of localized properties files. for example "resources_de.properties" would have a root of "resources"
 	const PROPERTIES_ROOT = 'resources';
 

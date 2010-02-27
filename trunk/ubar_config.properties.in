@@ -1,15 +1,15 @@
 ## Configuration for Ubar Framework
 ## TODO: consider lowercasing and using namespaces like db.user = false, db.server = foo, db.server.devMode = bar
 
-## base location of actions and views, if left empty full paths must be specified. may be full path, relative from web root
-BASE_ACTION_PATH			= ../WEB-INF/controller/
-BASE_ACTION_PATH_DEV_MODE	= ../WEB-INF/controller/
-BASE_VIEW_PATH				= ../WEB-INF/view/
-BASE_VIEW_PATH_DEV_MODE		= ../WEB-INF/view/
+## base location of actions and views, if left empty full paths must be specified. may be full path, relative from Ubar root
+BASE_ACTION_PATH			= ../../controller/
+BASE_ACTION_PATH_DEV_MODE	= ../../controller/
+BASE_VIEW_PATH				= ../../view/
+BASE_VIEW_PATH_DEV_MODE		= ../../view/
 
-## location of properties file
-PROPERTIES_PATH				= ../WEB-INF/properties/
-PROPERTIES_PATH_DEV_MODE	= ../WEB-INF/properties/
+## location of properties files
+PROPERTIES_PATH				= ../../properties/
+PROPERTIES_PATH_DEV_MODE	= ../../properties/
 
 # properties root name (ie, root of resources_de.properties would be "resources"
 PROPERTIES_ROOT				= resources
@@ -57,11 +57,11 @@ DB_SERVER_DEV_MODE			= localhost
 DB_USERNAME					= holistic_site
 DB_USERNAME_DEV_MODE		= root
 ## password
-DB_PASSWORD					= 1splork
+DB_PASSWORD					= mysql
 DB_PASSWORD_DEV_MODE		= 
 ## database name
-DB_NAME						= ganderson
-DB_NAME_DEV_MODE			= holisticmonkey
+DB_NAME						= site_test
+DB_NAME_DEV_MODE			= site_deploy
 ## always connect
 ## NOTE: if this is turned off, you should have a page specific way of turning on the connection
 DB_ALWAYS_CONNECT			= true
