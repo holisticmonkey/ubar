@@ -14,7 +14,13 @@
 	
 	<!-- templates to render page within, add template=TEMPLATE_NAME to an action def to use -->
 	<templates>
-		<template name="default" path="templates.default" />
+		<template name="default" path="templates.default">
+			<param name="section" value="" />
+			<param name="subSection" value="" />
+		</template>
+		<template name="portfolio" extends="default">
+			<param name="section" value="portfolio" />
+		</template>
 	</templates>
 	
 	<!-- common sets of required permissions for an action, may appear more than once in an action def, additive -->
@@ -42,7 +48,7 @@
 	<!-- @view - location of php file to render the view. this should have access to public methods of the action and base action -->
 	
 	<actions>
-		<action name="Home" path="Home" view="pages.home" template="default">
+		<action name="Home" view="pages.home" template="default">
 			<permissionGroup name="default" />
 			<permissions>
 				<permission name="update" />
@@ -55,20 +61,19 @@
 				<result name="JSON" type="json" />
 			</results>
 		</action>
-		<action name="Contact" path="Contact" view="pages.contact" template="default">
-			<permissionGroup name="default" />
-			<permissions>
-				<permission name="update" />
-				<permission name="delete" />
-			</permissions>
-			<results>
-				<result name="ERROR" type="action">Error</result>
-				<result name="ALT_VIEW">pages.misc.testPage</result>
-				<result name="JSON" type="json" />
-			</results>
-		</action>
-		<!-- update to no path meaning that result is automatically SUCCESS -->
-		<action name="Resume" path="Resume" view="pages.resume" template="default" />
+		<action name="Contact" view="pages.contact" template="default" titleKey="contact.title" />
+		<action name="Resume" view="pages.resume" template="default" />
 		<action name="Blog" path="Blog" view="pages.blog" template="default" />
+		<action name="Privacy" view="pages.privacy" template="default" />
+		<action name="Bio" view="pages.bio" template="default" />
+		<action name="Framework" view="pages.framework" template="default" />
+		
+		<!-- portfolio -->
+		<action name="Portfolio" view="pages.portfolio" template="portfolio" titleKey="portfolio.title" />
+		<action name="FineArt" view="pages.portfolio.fineArt" template="portfolio" titleKey="fineArt.title" subSection="fineArt" />
+		
+		<!-- TODO: do most complex action def possible to test things out -->
+		<action name="Test" path="Test" view="pages.test" template="test" title="Test Title Should Be Overriden" titleKey="test.title" />
+		
 	</actions>
 </actionMappings>

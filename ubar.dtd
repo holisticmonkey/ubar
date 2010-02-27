@@ -24,10 +24,11 @@
 
 <!ELEMENT templates (template)+>
 
-<!ELEMENT template EMPTY>
+<!ELEMENT template (param*)>
 <!ATTLIST template
     name CDATA #REQUIRED
-    path CDATA #REQUIRED
+    path CDATA #IMPLIED
+    extends CDATA #IMPLIED
 >
 
 <!ELEMENT permissionGroups (permissionGroup+)>
@@ -49,6 +50,10 @@
     name CDATA #IMPLIED
     path CDATA #IMPLIED
     view CDATA #IMPLIED
+    title CDATA #IMPLIED
+    titleKey CDATA #IMPLIED
+    section CDATA #IMPLIED
+    subSection CDATA #IMPLIED
     template CDATA #IMPLIED
     extends CDATA #IMPLIED
 >
@@ -56,3 +61,9 @@
 <!ELEMENT permissions (permission+)>
 
 <!ELEMENT results (result)*>
+
+<!ELEMENT param EMPTY>
+<!ATTLIST param
+    name CDATA #REQUIRED
+    value CDATA #REQUIRED
+>

@@ -53,7 +53,7 @@ function errorHandler($typeNumber, $message, $file, $line, $variables) {
 	*/
 
 	// put an extra break for visual separation from next error
-	$errorMessage .= "<br />";
+	$errorMessage = nl2br($errorMessage) . "<br />";
 
 	// print message
 	echo $errorMessage;
@@ -73,9 +73,18 @@ function errorHandler($typeNumber, $message, $file, $line, $variables) {
 	return true;
 }
 
-function debug($object, $explode = false) {
+function exceptionHandler($e) {
+	echo "<div style=\"padding: 20px; font-family: monospace; font-size: 16px; border: 2px solid #FF0000; background :#FFCC00; white-space: pre;\">";
+	echo '<strong>Uncaught ' . get_class($e) . '</strong> (' . $e->getCode() . ")\n\n";
+	echo "<strong>Location</strong>: " . $e->getFile() . " line " . $e->getLine() . "\n";
+	echo "<strong> Message</strong>: " . htmlentities($e->getMessage()) . "\n";
+	echo "<strong>   Stack</strong>:\n<div style=\"padding: 5px 0px 0px 50px\">" . htmlentities($e->getTraceAsString ()) . "</div>";
+	echo "</div>";
+}
+
+function debug($object) {
 	if (DEV_MODE) {
-		if ($explode) {
+		if (is_object($object) || is_array($object)) {
 			echo "<pre>";
 			print_r($object);
 			echo "</pre>";

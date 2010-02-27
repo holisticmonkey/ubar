@@ -2,8 +2,6 @@
 # ALLOW INITIALIZATION OF CLASSES
 // TODO: consider having ubar_resources.properties for error messages and similar
 
-
-
 // test cases call this directly instead of through index.php so need to define root
 if(!defined('UBAR_ROOT')) {
 	define('UBAR_ROOT', dirname(__FILE__) . "/");
@@ -19,10 +17,7 @@ getClassPaths(UBAR_ROOT . "/exception", TRUE);
 getClassPaths(UBAR_ROOT . "/core", TRUE);
 
 # GET PROPERTIES
-if(!defined('UBAR_CONFIG_PATH')) {
-	define('UBAR_CONFIG_PATH', null);
-}
-$props = new Properties(UBAR_CONFIG_PATH, true);
+$props = new Properties(UBAR_ROOT . "ubar_config.properties", true);
 
 # DEFINE CONSTANTS FROM PROPERTIES FILE
 // get dev mode first to know which property name to use
@@ -45,13 +40,13 @@ define('PROPERTIES_ROOT', $props->get('PROPERTIES_ROOT', GlobalConstants :: PROP
 // note, defaults to expected installation struction
 define('BASE_ACTION_PATH', UBAR_ROOT . "/" . $props->get('BASE_ACTION_PATH' . PROP_APPEND, GlobalConstants :: BASE_ACTION_PATH));
 if (!is_dir( BASE_ACTION_PATH)) {
-	die("Unable to find specified action root path at \"" . BASE_ACTION_PATH . "\"." . " File: " . __FILE__ . " on line: " . __LINE__);
+	throw new Exception("Unable to find specified action root path at \"" . BASE_ACTION_PATH . "\".");
 }
 getClassPaths(BASE_ACTION_PATH, TRUE);
 
 define('BASE_VIEW_PATH', UBAR_ROOT . "/" . $props->get('BASE_VIEW_PATH' . PROP_APPEND, GlobalConstants :: BASE_VIEW_PATH));
 if (!is_dir(BASE_VIEW_PATH)) {
-	die("Unable to find specified view root path at \"" . BASE_VIEW_PATH . "\"." . " File: " . __FILE__ . " on line: " . __LINE__);
+	throw new Exception("Unable to find specified view root path at \"" . BASE_VIEW_PATH . "\".");
 }
 
 // define default timezone
@@ -82,11 +77,16 @@ ini_set('html_errors', HTML_ERRORS ? GLobalConstants :: INI_OFF : GLobalConstant
 
 # CONFIGURE ERROR DISPLAY
 ini_set('display_errors', (DEV_MODE || DISPLAY_ERRORS) ? GLobalConstants :: INI_ON : GLobalConstants :: INI_OFF);
+ini_set('error_reporting', E_ALL | E_STRICT);
 
 # SET CUSTOM ERROR HANDLER
 if (function_exists("errorHandler")) {
 	set_error_handler("errorHandler", E_ALL);
 }
+if (function_exists("exceptionHandler")) {
+	set_exception_handler("exceptionHandler");
+}
+
 
 # SET CACHE RELATED HEADERS
 
@@ -174,6 +174,13 @@ $currentLocale = setlocale(LC_ALL, explode(",", $localeNameArray));
 define('LOCALE', $currentLocale);
 
 // set up localized properties? pick up from session since may be from user settings?
+
+// get action definitions
+// TODO: get dtd hosted somewhere and allow ubar.xml to be moved
+$dispatcher = new Dispatcher(UBAR_ROOT . "/ubar.xml");
+
+// not that framework is setup, let the controller dispatch the request
+$dispatcher->dispatch();
 
 
 ?>

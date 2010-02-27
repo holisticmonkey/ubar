@@ -50,7 +50,7 @@ class Properties {
 		// preserve whitespace of value until retrieved
 		$value = substr($line, $equalsPos + 1);
 		// remove newlines
-		$value = rtrim($value, "\r\n");
+		$value = Str::stripNewlines($value);
 
 		// if exists, warning that duplicate key found for Foo on line N
 		if(isset($this->properties[$key])) {

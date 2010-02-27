@@ -1,6 +1,10 @@
 <?
 class Str {
 
+	//const REGEX_SPECIAL_CHARS_REGEX = '/(\.|\?|\*|\+|\{|\}|\[|\]|\-|\^|\$|\\b|\\B|\\<|\\>)/';
+
+	const REGEX_SPECIAL_CHARS_REGEX = '/(\.|\?|\*|\+|\{|\}|\[|\]|\-|\^|\$|\\\\b)/';
+
 	public static function nullOrEmpty($var, $countWhitespace = false) {
 		// if null or not initialized, return true
 		if (!isset ($var) || is_null($var)) {
@@ -20,15 +24,40 @@ class Str {
 		return false;
 	}
 
-	// TODO: replace anything that is a special char in a regex
+	/**
+	 * Escape a string for use in a regular expression. This is useful when a
+	 * block of text is to be used in a regular expression match.
+	 *
+	 * @param regexSource
+	 *            - source string to escape
+	 * @return an escaped version of the string for use in a regular expression
+	 *
+	 * @see #REGEX_SPECIAL_CHARS_REGEX
+	 */
 	public static function escapeRegex($string) {
-		$string = str_replace(".", "\.", $string);
-		return $string;
+		// special chars -> . ? * + {} [] - ^ $ \b \B \< \>
+		//$string = str_replace(".", "\.", $string);
+		return preg_replace(self::REGEX_SPECIAL_CHARS_REGEX, "\\\\$1", $string);
+		//return preg_replace("/(\.|\?)/", "\\\\$1", $string);
 	}
 
-	public static function strToInt($number) {
+	// TODO: allow passed in locale? or just force people to update setlocale()?
+	// TODO: allow specified number of decimals
+	// TODO: allow flag for adaptive decimals (ie 10 and 10.332 could both be with 4 decimals if they don't have more decimals..)
+	public static function formatNumber($number, $maxDecimals = 4, $localeOverride = null) {
+		if(isset($localeOverride)) {
+			// capture current locale
+
+			// set to new locale if possible
+
+			// get locale info
+
+			// set back to old locale
+		}
 		$locale = localeconv();
-		return number_format($number, 0, $locale['decimal_point'], $locale['thousands_sep']);
+
+		$decimals = fmod($number, 1) * $maxDecimals * 10;
+		return number_format($number, 4, $locale['decimal_point'], $locale['thousands_sep']);
 	}
 
 	#convert to html special chars exept for links, images, and basic font modifiers. also convert newlines to breaks
@@ -61,5 +90,9 @@ class Str {
 	}
 
 	// add stripNewlines(), see Properties
+
+	public static function stripNewLines($string) {
+		return rtrim($string, "\r\n");
+	}
 }
 ?>

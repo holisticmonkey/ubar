@@ -1,32 +1,47 @@
 <?php
-
-
-// TODO: make this abstract?
-// TODO: make action interface
-// TODO: have method that declares function defs so they're avail to page? do just before rendering page
-class ActionManager {
+class ActionDef {
 
 	private $actionLocation;
 	private $actionClassName;
 	private $viewLocation;
 	private $permissions;
 	private $results;
-	private $className;
-	private $template;
+	private $name;
+	private $templateName;
+	private $title;
+	private $titleKey;
+	private $page;
+	private $section;
+	private $subSection;
 
 	public function __construct($actionXML) {
-		$this->actionLocation = FileUtils :: dotToPath((string) $actionXML['path']);
-		$this->template = (string) $actionXML['template'];
-		$this->actionClassName = FileUtils :: classFromFile((string) $actionXML['path']);
+		$path = ((string) $actionXML['path']);
+		// use dummy action if no action defined
+		if($path != '') {
+			$this->actionLocation = FileUtils :: dotToPath($path);
+			$this->actionClassName = FileUtils :: classFromFile($path);
+		} else {
+			$this->actionClassName = GlobalConstants :: DUMMY_ACTION;
+		}
+		$this->templateName = (string) $actionXML['template'];
 		$this->viewLocation = FileUtils :: dotToPath((string) $actionXML['view']);
 		$this->results = $actionXML->results;
 		$this->permissionGroup = $actionXML->permissionGroup;
 		$this->permissions = $actionXML->permissions;
-		//debug($this, true);
+		$this->name = (string) $actionXML['name'];
+
+		//print_r($actionXML);
+		// display values
+		$this->title = (string) $actionXML['title'];
+		$this->titleKey = (string) $actionXML['titleKey'];
+		// TODO: page mostly makes sense as action name, consider decoupling however
+		$this->page = (string) $actionXML['name'];
+		$this->section = (string) $actionXML['section'];
+		$this->subSection = (string) $actionXML['subSection'];
 	}
 
-	public function getTemplate() {
-		return $this->template;
+	public function getTemplateName() {
+		return $this->templateName;
 	}
 
 	public function getActionLocation() {
@@ -39,6 +54,30 @@ class ActionManager {
 
 	public function getClassName() {
 		return $this->actionClassName;
+	}
+
+	public function getName() {
+		return $this->name;
+	}
+
+	public function getTitle() {
+		return $this->title;
+	}
+
+	public function getTitleKey() {
+		return $this->titleKey;
+	}
+
+	public function getPage() {
+		return $this->page;
+	}
+
+	public function getSection() {
+		return $this->section;
+	}
+
+	public function getSubSection() {
+		return $this->subSection;
 	}
 
 	public function isAllowed($permissionArgs) {

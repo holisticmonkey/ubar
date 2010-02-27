@@ -37,6 +37,9 @@ class UbarBaseTestCase extends UnitTestCase {
 			getClassPaths(UBAR_ROOT . "exception", TRUE);
 			getClassPaths(UBAR_ROOT . "core", TRUE);
 		}
+
+		// defualt to us english, if you need to change locally, might need to reset when done with test
+		setlocale(LC_ALL, 'english-usa', 'en_US.utf8');
 		parent :: __construct();
 	}
 
