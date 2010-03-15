@@ -71,5 +71,15 @@ class ActionMapper {
 	public function getDefaultAction() {
 		return $this->getAction($this->defaultActionName);
 	}
+
+	public function getGlobalResult($name) {
+		// find result object
+		foreach ($this->globalResults as $result) {
+			if ((string) $result['name'] == $name) {
+				return new Result($result);
+			}
+		}
+		return null;
+	}
 }
 ?>

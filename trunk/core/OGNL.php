@@ -31,7 +31,7 @@ RULES:
 	/*
 	function to process simple expression language in resource strings
 	*/
-	public static function get($string, $arguments = array()) {
+	public static function get($string, $arguments = array(), $locale = null) {
 		try {
 			// if argument is not array, wrap in array
 			if(!is_array($arguments)) {
@@ -71,7 +71,7 @@ RULES:
 					$string = str_replace($match[0], $value, $string);
 				// else, process the instructions using the provided value
 				} else {
-					$processedValue = self::processValue($value, $instructions);
+					$processedValue = self::processValue($value, $instructions, $locale);
 					if(!is_null($processedValue)) {
 						$string = str_replace($match[0], $processedValue, $string);
 					// if the value could not be processed, add to the ignore list
@@ -105,7 +105,7 @@ RULES:
 	}
 
 	// try to evaluate expression of directive
-	private static function processValue($value, $instructions) {
+	private static function processValue($value, $instructions, $locale = null) {
 		$returnString = NULL;
 		$type = NULL;
 		$modifiers = NULL;
@@ -127,7 +127,7 @@ RULES:
 		case "number":
 			// TODO: do a switch on modifier for float, decimal, money, etc
 				// use money_format() for formatting money in the Str class
-			$returnString = Str::formatNumber($value);
+			$returnString = Str::formatNumber($value, $locale);
 			break;
 
 		case "choice":

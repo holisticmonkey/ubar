@@ -49,6 +49,13 @@ if (!is_dir(BASE_VIEW_PATH)) {
 	throw new Exception("Unable to find specified view root path at \"" . BASE_VIEW_PATH . "\".");
 }
 
+// use of model directory is optional
+// TODO: consider just having an autoload directory in the config since it's not necessary to access this once added to autoloader
+define('BASE_MODEL_PATH', UBAR_ROOT . "/" . $props->get('BASE_MODEL_PATH' . PROP_APPEND, GlobalConstants :: BASE_MODEL_PATH));
+if (is_dir(BASE_MODEL_PATH)) {
+	getClassPaths(BASE_MODEL_PATH, TRUE);
+}
+
 // define default timezone
 try {
 	define('TIMEZONE_DEFAULT', $props->get('TIMEZONE_DEFAULT'));
@@ -64,9 +71,14 @@ if (DB_USE) {
 		define('DB_USERNAME', $props->get('DB_USERNAME' . PROP_APPEND));
 		define('DB_PASSWORD', $props->get('DB_PASSWORD' . PROP_APPEND));
 		define('DB_NAME', $props->get('DB_NAME' . PROP_APPEND));
-		define('DB_ALWAYS_CONNECT', $props->getBool('DB_ALWAYS_CONNECT', GlobalConstants :: DB_ALWAYS_CONNECT));
 	} catch (Exception $e) {
 		throw new Exception("This application is configured to connect to a database but one or more required configurations was missing");
+	}
+	try {
+		define('SCHEMA_VERSION', $props->get('SCHEMA_VERSION'));
+		define('SCHEMA_PATH', $props->get('SCHEMA_PATH'));
+	} catch (Exception $e) {
+		// values allowed to be undefined
 	}
 }
 
@@ -79,7 +91,7 @@ ini_set('html_errors', HTML_ERRORS ? GLobalConstants :: INI_OFF : GLobalConstant
 ini_set('display_errors', (DEV_MODE || DISPLAY_ERRORS) ? GLobalConstants :: INI_ON : GLobalConstants :: INI_OFF);
 ini_set('error_reporting', E_ALL | E_STRICT);
 
-# SET CUSTOM ERROR HANDLER
+# SET CUSTOM ERROR HANDLERS
 if (function_exists("errorHandler")) {
 	set_error_handler("errorHandler", E_ALL);
 }
@@ -102,46 +114,21 @@ ini_set('session.gc_maxlifetime', SESSION_LIFETIME);
 
 # start session
 session_start();
-/*
-# db connection params
-$db_server = DEV_MODE ? DB_SERVER_DEV_MODE : DB_SERVER;
-$db_user = DEV_MODE ? DB_USERNAME_DEV_MODE : DB_USERNAME;
-$db_password = DEV_MODE ? DB_PASSWORD_DEV_MODE : DB_PASSWORD;
-$db_name = DEV_MODE ? DB_NAME_DEV_MODE : DB_NAME;
 
-# connect to db if necessary
-// TODO: move this out into the controller since there may be page configuration on the connection
-if(ALWAYS_CONNECT || (isset($usesDB) && $usesDB === true)){
-	if(!mysql_connect($db_server, $db_user, $db_password)){
-		addError("Unable to connect to database: " . mysql_error());
-	}
-	// select database
-	if(!mysql_select_db($db_name)) {
-		// TODO: externalize all these queries
-		// if it doesn't exist, create it and create necessary tables
-		mysql_query("CREATE DATABASE " . $db_name);
-		mysql_select_db($db_name);
-		// create users table
-			// id, name, email, password, isAdmin, isConfirmed
-		// create blog table
-			// title, body, date
-		// create links and resources table
-			// title, description, date
-		// create email list table
-	}
-}
 
+// TODO: store permissions object in session? have things that invalidate it flush it?
+// TODO: drop this and have UserManager that gets called in dispatcher to determine if should return GlobalConstants::PERMISSION_DENIED?
+// TODO: have base action call to get user props and have isAdmin() on it so can display more info on page if admin...
 # if user, get them and init user object
-$_SESSION['userID'] = 1;
-if(isset($_SESSION['userID'])) {
+if(isset($_SESSION['userid'])) {
 	// TODO: replace this query with a call to query provider
-	$query = "SELECT * FROM Users WHERE userID=" . 1;
+	$query = "SELECT * FROM users WHERE userid=" . $_SESSION['userid'];
 	if(!$result = mysql_query($query)){
 		//addError("Error running query: " . mysql_error());
 	}
 	// init User object using id, class knows what queries to run to populate self. throws InvalidUserError if not found
 }
-*/
+
 # determine if user allowed to see this page, redirect if not
 // if page requires user and user not logged in - fail
 // if page requires admin and user not admin - fail

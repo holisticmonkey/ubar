@@ -18,7 +18,7 @@
 
 <!ELEMENT result (#PCDATA)>
 <!ATTLIST result
-    name CDATA #REQUIRED
+    name CDATA #IMPLIED
     type (action|page|url|json) "page"
 >
 

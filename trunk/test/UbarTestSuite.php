@@ -1,14 +1,28 @@
-<?
-class UbarTestSuite extends TestSuite {
+<?php
+class UbarTestSuite extends PHPUnit_Framework_TestSuite {
+
 	public function __construct() {
 		require_once (dirname(__FILE__) . "/../functions/misc.php");
 
 		// allow the following folders of classes to be auto-loaded
-		define('UBAR_ROOT', dirname(__FILE__) . "/../");
-		getClassPaths(UBAR_ROOT . "constants", TRUE);
-		getClassPaths(UBAR_ROOT . "exception", TRUE);
-		getClassPaths(UBAR_ROOT . "core", TRUE);
-		parent::__construct();
+		if (!defined('UBAR_ROOT')) {
+			define('UBAR_ROOT', realpath(dirname(__FILE__) . "/../") . DIRECTORY_SEPARATOR);
+			getClassPaths(UBAR_ROOT . "constants", TRUE);
+			getClassPaths(UBAR_ROOT . "exception", TRUE);
+			getClassPaths(UBAR_ROOT . "core", TRUE);
+			getClassPaths(UBAR_ROOT . "test", TRUE);
+		}
+		parent :: __construct();
+	}
+
+	public static function suite() {
+		$suite = new UbarTestSuite('masterSuite');
+		//$suite->addTest(new StrTest('nameasdf'));
+		$suite->addTestSuite('StrTest');
+		$suite->addTestSuite('PropertiesTest');
+		//$suite->addTestSuite('OGNLTest');
+		//$suite->addTestSuite('LocalizedPropertiesTest');
+		return $suite;
 	}
 }
 ?>

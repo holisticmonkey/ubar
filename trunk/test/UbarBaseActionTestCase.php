@@ -3,7 +3,7 @@
  * Base class for testing Actions or functionality that requires a setup context.
  * Note that a simulation of the config, controller, and views are nested in the test directory.
  */
-require_once (dirname(__FILE__) . "/UbarBaseTestCase.php");
+require_once("UbarBaseTestCase.php");
 abstract class UbarBaseActionTestCase extends UbarBaseTestCase {
 
 	private $actionMapper;

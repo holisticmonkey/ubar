@@ -1,5 +1,5 @@
 <?php
-require ("UbarBaseTestCase.php");
+require_once("UbarBaseTestCase.php");
 class PropertiesTest extends UbarBaseTestCase {
 
 	function test_construct() {
@@ -9,20 +9,19 @@ class PropertiesTest extends UbarBaseTestCase {
 
 		$pathToPropertiesClass = UBAR_ROOT . "core" . DIRECTORY_SEPARATOR . "Properties.php";
 
-		$expectedMessage = "Path \"$bad\" to properties file does not exist. File: " . $pathToPropertiesClass . " on line: 21";
+		$expectedMessage = "Path \"$bad\" to properties file does not exist. File: " . $pathToPropertiesClass . " on line: 22";
 
 		// test that it fails if you give a bad file
 		try {
 			new Properties($bad);
 			$this->fail("Expected exception trying to get nonexistant file.");
 		} catch (Exception $e) {
-			echo($e->getMessage() . "\n");
-			$this->assertIdentical($expectedMessage, $e->getMessage());
+			$this->assertEquals($expectedMessage, $e->getMessage());
 		}
 
 		// test that it fails silently and returns default if fail silent on and default provided
 		$badProps = new Properties($bad, true);
-		$this->assertIdentical("", $badProps->get("foo", ""));
+		$this->assertEquals("", $badProps->get("foo", ""));
 
 		// test that all is well if you give it a real file
 		$goodProps = new Properties($good);
@@ -35,10 +34,10 @@ class PropertiesTest extends UbarBaseTestCase {
 		$props = new Properties($path);
 
 		// test normal
-		$this->assertIdentical("This is a simple message string with no substitutions.", $props->get("sample.simple"));
+		$this->assertEquals("This is a simple message string with no substitutions.", $props->get("sample.simple"));
 
 		// test normal with default
-		$this->assertIdentical("This is a simple message string with no substitutions.", $props->get("sample.simple", "foo"));
+		$this->assertEquals("This is a simple message string with no substitutions.", $props->get("sample.simple", "foo"));
 
 		// test missing
 		try {
@@ -46,18 +45,16 @@ class PropertiesTest extends UbarBaseTestCase {
 			$this->fail("Expected exception trying to get nonexistant property.");
 		} catch (Exception $e) {
 			$expectedMessage = "No property was found with the key \"sample.missing\" in the file \"$path\".";
-			$this->assertIdentical($expectedMessage, $e->getMessage());
+			$this->assertEquals($expectedMessage, $e->getMessage());
 		}
 
 		// test missing with default
-		$this->assertIdentical("foo", $props->get("sample.missing", "foo"));
+		$this->assertEquals("foo", $props->get("sample.missing", "foo"));
 
 		// test preserve extra space
 		$expected = "   hi   ";
-		echo("\"" . $props->get("sample.whitespace", null, true) . "\"\n");
-		echo("\"" . $expected . "\"\n");
-		$this->assertIdentical("   hi   ", $props->get("sample.whitespace", null, true));
-		$this->assertIdentical("hi", $props->get("sample.whitespace"));
+		$this->assertEquals("   hi   ", $props->get("sample.whitespace", null, true));
+		$this->assertEquals("hi", $props->get("sample.whitespace"));
 
 		// test getting something commented out
 		try {
@@ -65,7 +62,7 @@ class PropertiesTest extends UbarBaseTestCase {
 			$this->fail("Expected exception trying to get commented out property.");
 		} catch (Exception $e) {
 			$expectedMessage = "No property was found with the key \"sample.commentedOut\" in the file \"$path\".";
-			$this->assertIdentical($expectedMessage, $e->getMessage());
+			$this->assertEquals($expectedMessage, $e->getMessage());
 		}
 
 	}
@@ -76,7 +73,7 @@ class PropertiesTest extends UbarBaseTestCase {
 		$props = new Properties($path);
 
 		// test valid
-		$this->assertIdentical(TRUE, $props->getBool("sample.boolean"));
+		$this->assertEquals(TRUE, $props->getBool("sample.boolean"));
 
 		// test unable to convert (other errors covered in test_get()
 		try {
@@ -85,7 +82,7 @@ class PropertiesTest extends UbarBaseTestCase {
 		} catch (Exception $e) {
 			$value = $props->get("sample.badboolean");
 			$expectedMessage = "The property found, " . $value . ", with the key \"sample.badboolean\" could not be converted to a boolean value in the file \"$path\".";
-			$this->assertIdentical($expectedMessage, $e->getMessage());
+			$this->assertEquals($expectedMessage, $e->getMessage());
 		}
 	}
 }

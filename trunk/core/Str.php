@@ -41,11 +41,14 @@ class Str {
 		//return preg_replace("/(\.|\?)/", "\\\\$1", $string);
 	}
 
-	// TODO: allow passed in locale? or just force people to update setlocale()?
+	// TODO: Update to use
 	// TODO: allow specified number of decimals
 	// TODO: allow flag for adaptive decimals (ie 10 and 10.332 could both be with 4 decimals if they don't have more decimals..)
 	public static function formatNumber($number, $maxDecimals = 4, $localeOverride = null) {
+		$locale = localeconv();
+		/*
 		if(isset($localeOverride)) {
+			$locale = $localeOverride;
 			// capture current locale
 
 			// set to new locale if possible
@@ -53,16 +56,23 @@ class Str {
 			// get locale info
 
 			// set back to old locale
+		} else {
+			$locale = localeconv();
 		}
-		$locale = localeconv();
-
-		$decimals = fmod($number, 1) * $maxDecimals * 10;
-		return number_format($number, 4, $locale['decimal_point'], $locale['thousands_sep']);
+		*/
+		//die(print_r($locale));
+		$decimals = 0;
+		$pos = strripos($number, $locale['decimal_point']);
+		if ($pos !== false) {
+			$decimals = min(strlen($number) - $pos, $maxDecimals);
+		}
+		return number_format($number, $decimals, $locale['decimal_point'], $locale['thousands_sep']);
 	}
 
 	#convert to html special chars exept for links, images, and basic font modifiers. also convert newlines to breaks
 	#function intended for use with user posted copy to allow basic formatting/functionality but also making html safe and allowing display of code
 	#note: may also want to auto link any urls and obfuscate all email addresses
+	// NOTE: cannot use  strip_tags() with allowable tags since it will not strip style or javascript which may be malicious
 	public static function sanitizeHTML($message) {
 		if (get_magic_quotes_gpc()) {
 			$message = stripslashes($message);
