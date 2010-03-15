@@ -21,6 +21,16 @@ class GlobalConstants {
 	const AUTH = 'AUTH';
 	const JSON_AUTH = 'JSON_AUTH';
 	const SETUP = 'SETUP';
+	const DEFAULT_NAME = self::SUCCESS;
+
+	# Possible result types
+	const ACTION_TYPE = 'action';
+	const PAGE_TYPE = 'page';
+	const FILE_TYPE = 'file';
+	const URL_TYPE = 'url';
+	const JSON_TYPE = 'json';
+	# Default result type
+	const DEFAULT_TYPE = self::FILE_TYPE;
 
 	# Ubar default config values in case not found in ubar_config.properties
 	// default locale string
@@ -74,9 +84,10 @@ class GlobalConstants {
 	# ROOT NAME OF PROPS FILE - root name of localized properties files. for example "resources_de.properties" would have a root of "resources"
 	const PROPERTIES_ROOT = 'resources';
 
-	const BASE_ACTION_PATH			= "../WEB-INF/controller/";
-	const BASE_VIEW_PATH			= "../WEB-INF/view/";
-	const BASE_PROPERTIES_PATH		= "../WEB-INF/properties/";
+	const BASE_MODEL_PATH			= "../../model/";
+	const BASE_ACTION_PATH			= "../../controller/";
+	const BASE_VIEW_PATH			= "../../view/";
+	const BASE_PROPERTIES_PATH		= "../../properties/";
 
 
 	# Exception codes

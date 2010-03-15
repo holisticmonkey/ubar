@@ -1,11 +1,13 @@
 ## Configuration for Ubar Framework
 ## TODO: consider lowercasing and using namespaces like db.user = false, db.server = foo, db.server.devMode = bar
 
-## base location of actions and views, if left empty full paths must be specified. may be full path, relative from Ubar root
+## base location of model and action classes as well as view files
 BASE_ACTION_PATH			= ../../controller/
 BASE_ACTION_PATH_DEV_MODE	= ../../controller/
 BASE_VIEW_PATH				= ../../view/
 BASE_VIEW_PATH_DEV_MODE		= ../../view/
+BASE_MODEL_PATH				= ../../model/
+BASE_MODEL_PATH_DEV_MODE	= ../../model/
 
 ## location of properties files
 PROPERTIES_PATH				= ../../properties/
@@ -13,12 +15,6 @@ PROPERTIES_PATH_DEV_MODE	= ../../properties/
 
 # properties root name (ie, root of resources_de.properties would be "resources"
 PROPERTIES_ROOT				= resources
-
-## Location of Resource Folders from Web Root
-## TODO: move this into project specific init as example
-#RELATIVE_CSS_ROOT			= static/css/
-#RELATIVE_IMG_ROOT			= static/images/
-#RELATIVE_JS_ROOT			= static/js/
 
 ## Default Timezone
 TIMEZONE_DEFAULT			= America/Los_Angeles
@@ -54,17 +50,18 @@ DB_USE						= true
 DB_SERVER					= localhost
 DB_SERVER_DEV_MODE			= localhost
 ## user
-DB_USERNAME					= holistic_site
+DB_USERNAME					= notroot
 DB_USERNAME_DEV_MODE		= root
 ## password
-DB_PASSWORD					= mysql
-DB_PASSWORD_DEV_MODE		= 
+DB_PASSWORD					= strongpassword
+DB_PASSWORD_DEV_MODE		= password
 ## database name
-DB_NAME						= site_test
-DB_NAME_DEV_MODE			= site_deploy
-## always connect
-## NOTE: if this is turned off, you should have a page specific way of turning on the connection
-DB_ALWAYS_CONNECT			= true
+DB_NAME						= mydatabase
+DB_NAME_DEV_MODE			= mytestdatabase
+## schema version, used to do automatic schema updates if configured correctly
+SCHEMA_VERSION				= 2
+## provide path and file name convention for sql schema files. MARK THE LOCATION OF THE VERSION NUMBER WITH A '*' (ex ../../sql/schema_*.sql)
+SCHEMA_PATH					= ../../sql/schema_*.sql
 
 ## session lifetime
 SESSION_LIFETIME			= 86400000

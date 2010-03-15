@@ -2,12 +2,15 @@
 
 // magic auto-loader function that tries to load classes that are in the allowed list
 // TODO: allow user to specify an autoload directory
+// TODO: also look for stuff in the path and pear classes http://php.net/manual/en/language.oop5.autoload.php
+// TODO: switch to using spl autoload so you can register multiple autoloaders and lib implementers can use it
+// 		 http://www.php.net/manual/en/function.spl-autoload.php
 function __autoload($className) {
 	global $classes;
 	$filename = $className . ".php";
 	if (isset ($classes[$filename])) {
 		// use require instead of require_once since never get here with this class already defined
-		require ($classes[$filename]);
+		require($classes[$filename]);
 	} else {
 		throw new Exception("Failed to autoload class \"$className\".");
 		// log that failed to find class through auto-loading
@@ -31,17 +34,17 @@ function getClassPaths($directory, $recursive = FALSE) {
 	}
 }
 
+// TODO: honor html_errors ini settings, wrap around div statements, have html and non html message versions and use sprintf for args
 // TODO: move presentation elsewhere
-// TODO: internationalize but have try catches around resource retrieval
 // TODO: make an error object with the pertinent properties
 // TODO: don't echo, push into a collection of error objects that (remember to use type hinting) that is displayed on an error page
 // TODO: figure out how to send to another page when you want to catch all errors before redirecting... can you listen for completion of scripting and
 // TODO: if this error happens before a page is rendered, may get xhtml parse error since not wrapped in a document, consider trying to set header to html (if xhtml) in a try catch, prepending with <html><document> if doesn't fail
 function errorHandler($typeNumber, $message, $file, $line, $variables) {
-	// Error type names array
+	echo "<div style=\"padding: 20px; margin-bottom: 10px; font-family: monospace; font-size: 16px; border: 2px solid #FF0000; background :#FFCC00; white-space: pre;\">";
 
 	// assemble message, converting error number to display name, escaping characters to make xhtml compatible
-	$errorMessage = "<strong>" . Exceptions :: $error_type[$typeNumber] . "</strong> -  " . htmlspecialchars($message) . "<br />Line $line in file $file.<br />PHP Version " . PHP_VERSION . "<br />";
+	echo ("<strong>" . Exceptions :: $error_type[$typeNumber] . "</strong> -  " . strip_tags($message) . "\nLine $line in file $file.\nPHP Version " . PHP_VERSION . "\n");
 
 	// if variables provided, add them to message
 	// NOTE: disabled as too verbose currently
@@ -52,11 +55,7 @@ function errorHandler($typeNumber, $message, $file, $line, $variables) {
 	}
 	*/
 
-	// put an extra break for visual separation from next error
-	$errorMessage = nl2br($errorMessage) . "<br />";
-
-	// print message
-	echo $errorMessage;
+	echo "</div>";
 
 	// abort if one of the errors that should cause an abort
 	if (in_array($typeNumber, array (
@@ -74,7 +73,7 @@ function errorHandler($typeNumber, $message, $file, $line, $variables) {
 }
 
 function exceptionHandler($e) {
-	echo "<div style=\"padding: 20px; font-family: monospace; font-size: 16px; border: 2px solid #FF0000; background :#FFCC00; white-space: pre;\">";
+	echo "<div style=\"padding: 20px; margin-bottom: 10px; font-family: monospace; font-size: 16px; border: 2px solid #FF0000; background :#FFCC00; white-space: pre;\">";
 	echo '<strong>Uncaught ' . get_class($e) . '</strong> (' . $e->getCode() . ")\n\n";
 	echo "<strong>Location</strong>: " . $e->getFile() . " line " . $e->getLine() . "\n";
 	echo "<strong> Message</strong>: " . htmlentities($e->getMessage()) . "\n";

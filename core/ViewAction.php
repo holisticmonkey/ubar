@@ -21,7 +21,7 @@ abstract class ViewAction extends Action {
 		// if no value set, will get back an empty string from the def
 		if ($this->title == '') {
 			$key = $def->getTitleKey();
-			if (!is_null($key)) {
+			if ($key != '') {
 				$this->title = getTxt($key);
 			}
 		}

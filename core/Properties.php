@@ -1,5 +1,6 @@
 <?
 class Properties {
+
 	// complate path to propoerty file including file name
 	private $file;
 
@@ -7,8 +8,8 @@ class Properties {
 	private $properties = array();
 
 	// test if a commented out line
-
-	const PROP_COMMENT_REGEX = '/^\s#.*$/mSu';
+	// NOTE: extra analysis since reused, and utf-8 compatible
+	const PROP_COMMENT_REGEX = '/^\s*(#|!).*$/Smu';
 
 	// flag for whether in dev mode, must be set in construct
 	private $devMode = true;
@@ -35,11 +36,9 @@ class Properties {
 	}
 
 	private function ingestLine($line, $lineNum) {
-		// if first non whitespace char is #, skip
-		preg_match(self::PROP_COMMENT_REGEX, $line, $matches);
-		if (isset($matches[0])) {
-			return;
-		}
+		// strip out comments
+		$line = preg_replace(self::PROP_COMMENT_REGEX, "", $line);
+
 		// get first index of '=', if -1, skip
 		$equalsPos = strpos($line, "=");
 		if($equalsPos === false) {
@@ -61,6 +60,7 @@ class Properties {
 		$this->properties[$key] = $value;
 	}
 
+	// TODO: determine a way to allow default to be null
 	public function get($key, $default = NULL, $preserveExtraSpace = FALSE) {
 		// if found, return it
 		if (array_key_exists($key, $this->properties)) {

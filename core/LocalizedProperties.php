@@ -4,7 +4,7 @@
 // TODO: make a generic property accessor that this is a wrapper for that knows what files to look for
 
 // regex resources for property matching
-define('PROP_VALUE_REGEX_PREPEND', '/^');
+define('PROP_VALUE_REGEX_PREPEND', '/^\s*');
 // NOTE: modifiers are multiline, extra analysis since reused, and utf-8 compatible
 // NOTE: only zero or one white spaces after the "=" are stripped from the match so that you can get spaces before your string...
 define('PROP_VALUE_REGEX_APPEND', '\s*=\s{0,1}(.*)$/mSu');
@@ -48,7 +48,10 @@ class LocalizedProperties {
 
 		// get locale
 		if (isset ($locale) && !is_null($locale)) {
-			$this->locale = $locale;
+			// TODO: make it not throw an error if pear package not installed for localization
+			// TODO: either use php 5.3 or PEAR i18n
+			//$this->locale = Locale::parseLocale($locale);
+			//die(print_r($this->locale));
 		} else
 			if (defined(LOCALE)) {
 				$this->locale = LOCALE;
@@ -79,6 +82,9 @@ class LocalizedProperties {
 				$this->properties = file_get_contents($localizedPath);
 			}
 		}
+		// strip comments - this is anything where the first non whitespace is #
+		// TODO: see http://en.wikipedia.org/wiki/.properties for other rules
+		$this->properties = preg_replace(Properties::PROP_COMMENT_REGEX, "", $this->properties);
 	}
 
 	/*
@@ -92,7 +98,7 @@ class LocalizedProperties {
 	public function get($key, $arguments = array (), $strict = FALSE) {
 		$entry = $this->getSimple($key, $strict);
 		if (count($arguments) > 0) {
-			return OGNL :: get($entry, $arguments);
+			return OGNL :: get($entry, $arguments, $this->locale);
 		}
 		return $entry;
 	}
