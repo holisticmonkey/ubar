@@ -6,6 +6,8 @@
 if(!defined('UBAR_ROOT')) {
 	define('UBAR_ROOT', dirname(__FILE__) . "/");
 }
+// helper for calls to other lib folders
+define('LIB_ROOT', UBAR_ROOT . "../");
 
 // include functions
 // TODO: require everything the functions folder?
