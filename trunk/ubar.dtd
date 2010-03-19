@@ -19,6 +19,7 @@
 <!ELEMENT result (#PCDATA)>
 <!ATTLIST result
     name CDATA #IMPLIED
+    template CDATA #IMPLIED
     type (action|page|url|json) "page"
 >
 

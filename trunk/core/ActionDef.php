@@ -23,7 +23,9 @@ class ActionDef {
 		} else {
 			$this->actionClassName = GlobalConstants :: DUMMY_ACTION;
 		}
-		$this->templateName = (string) $actionXML['template'];
+		if (!is_null($actionXML['template'])) {
+			$this->templateName = (string) $actionXML['template'];
+		}
 		if (!is_null($actionXML['view'])) {
 			$this->viewLocation = FileUtils :: dotToPath((string) $actionXML['view']);
 		}

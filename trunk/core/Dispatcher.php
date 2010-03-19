@@ -8,8 +8,6 @@ class Dispatcher {
 
 	private $action;
 
-	private $view;
-
 	private $actionDef;
 
 	public function __construct($configPath) {
@@ -65,33 +63,15 @@ class Dispatcher {
 			require_once ($actionRealPath);
 		}
 
-		// verify that view exists if view was specified
-		$hasView = false;
-		if (!is_null($this->actionDef->getViewLocation())) {
-			$viewRealPath = BASE_VIEW_PATH . $this->actionDef->getViewLocation();
-			if (!is_null($this->actionDef->getViewLocation()) && (!file_exists($viewRealPath) || !is_file($viewRealPath))) {
-				throw new ViewNotFoundException($this->actionDef);
-			} else {
-				$hasView = true;
-				$this->view = $viewRealPath;
-			}
-		}
-
 		// instantiate specific action
 		$actionClassName = $this->actionDef->getClassName();
-		$this->action = new $actionClassName ($this->view, $this->actionDef);
+		$this->action = new $actionClassName ($this->actionDef);
 
 		// populate action from get and post
 		$this->populateUserInput();
 
-		// check to see that user input conditions are met (if any) before executing aciton body
-		$resultString = null;
-		if ($this->isUserInputValid()) {
-			$resultString = GlobalConstants :: USER_ERROR;
-		} else {
-			// get result by executing action body
-			$resultString = $this->action->execute();
-		}
+		// execute action, note that body may not execute if user conditions not met
+		$resultString = $this->action->execute();
 
 		$resultDef = $this->actionDef->getResult($resultString);
 
@@ -104,12 +84,12 @@ class Dispatcher {
 		if ($resultDef == null) {
 			switch ($resultString) {
 				case GlobalConstants :: SUCCESS :
-					// only ok to have no def if has view
-					if (!$hasView) {
+					// only ok to have no result if has view in action def
+					if (is_null($this->actionDef->getViewLocation())) {
 						throw new Exception("To use the default result for an action, you must have a view specified");
 					}
 					// create a dummy result that uses the defaults
-					$resultDef = Result :: makeResult(null, GlobalConstants :: PAGE_TYPE);
+					$resultDef = Result :: makeResult(GlobalConstants :: SUCCESS, GlobalConstants :: PAGE_TYPE);
 					break;
 				case GlobalConstants :: JSON :
 					// to render json, action must extend JSONAction
@@ -132,10 +112,11 @@ class Dispatcher {
 				header('Location: ' . $resultDef->getTarget() . ".action");
 				break;
 			case GlobalConstants :: PAGE_TYPE :
-				$this->renderPage();
+				// pass in possible overrides for page and template
+				$this->renderPage($resultDef);
 				break;
 			case GlobalConstants :: FILE_TYPE :
-				require_once ($resultDef->getTarget());
+				require_once (BASE_VIEW_PATH . $resultDef->getTarget());
 				return;
 			case GlobalConstants :: URL_TYPE :
 				if (Str :: nullOrEmpty($resultDef->getTarget())) {
@@ -152,11 +133,34 @@ class Dispatcher {
 		}
 	}
 
-	public function renderPage() {
-		// is there a template referenced to render the view inside?
-		$templateName = $this->actionDef->getTemplateName();
+	private function initView(Result $result) {
+		$viewPath = $result->getViewLocation();
+		if(is_null($viewPath)) {
+			$viewPath = $this->actionDef->getViewLocation();
+		}
+		if (!is_null($viewPath)) {
+			$viewRealPath = BASE_VIEW_PATH . $viewPath;
+			if (!file_exists($viewRealPath) || !is_file($viewRealPath)) {
+				throw new ViewNotFoundException($viewRealPath);
+			} else {
+				$this->action->setView($viewRealPath);
+			}
+		} else {
+			throw new Exception("No view defined for action definition or result.");
+		}
+	}
 
-		if (!Str :: nullOrEmpty($templateName)) {
+	public function renderPage(Result $result) {
+		// set the view or throw error if not defined
+		$this->initView($result);
+
+		// is there a template referenced to render the view inside?
+		$templateName = $result->getTemplateName();
+		if(is_null($templateName)) {
+			$templateName = $this->actionDef->getTemplateName();
+		}
+
+		if (!is_null($templateName)) {
 
 			$templateDef = $this->actionMapper->getTemplate($templateName);
 
@@ -185,7 +189,7 @@ class Dispatcher {
 
 	// render the view associated with the action
 	public function renderBody() {
-		require_once ($this->view);
+		require_once ($this->action->getView());
 	}
 
 	// try to set each get and post param in the action
@@ -196,15 +200,6 @@ class Dispatcher {
 		foreach ($_POST as $key => $val) {
 			$this->action->set($key, $val);
 		}
-	}
-
-	// do validation, if any, on action and return true if no errors found
-	private function isUserInputValid() {
-		// run validation method on action
-		$this->action->validateUserInput();
-
-		// check to see if errors (not warnings, they are non-blocking)
-		return $this->action->hasErrors();
 	}
 }
 ?>
