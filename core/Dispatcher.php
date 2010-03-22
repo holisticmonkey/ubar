@@ -4,6 +4,10 @@ class Dispatcher {
 	// TODO: allow override of action identifier
 	const ACTION_REGEX = '/([^\/]+)\.action/u';
 
+	// multiline, extra analysis, utf-8, ungreedy
+	// get anything like ${foo} and match the 'foo' part for action method call
+	const RESULT_EXPRESSION_REGEX = '/\${([^$]*)}/mSuU';
+
 	private $actionMapper;
 
 	private $action;
@@ -106,6 +110,7 @@ class Dispatcher {
 		// guaranteed to have a result def, switch on type
 		switch ($resultDef->getType()) {
 			case GlobalConstants :: ACTION_TYPE :
+
 				// make a new request so there is no redeclaration or confusion with request params
 				// NOTE: this is less efficient but safer
 				// TODO: get possible override for action identifier instead of hardcoding ".action"
@@ -122,7 +127,11 @@ class Dispatcher {
 				if (Str :: nullOrEmpty($resultDef->getTarget())) {
 					throw new Exception("With a url result type, you must specify a location to redirect to");
 				}
-				header('Location: ' . $resultDef->getTarget());
+
+				// url types (and possibly others?) may have expressions embedded in target, evaluate
+				$target = $this->evaluateResultString($resultDef->getTarget());
+
+				header('Location: ' . $target);
 				return;
 			case GlobalConstants :: JSON_TYPE :
 				// to render json, action must extend JSONAction
@@ -185,6 +194,9 @@ class Dispatcher {
 		} else {
 			$this->renderBody();
 		}
+
+		// clear volatile data used in next view after execution, view has been rendered and data no longer pertinent
+		$this->action->clearTempData();
 	}
 
 	// render the view associated with the action
@@ -200,6 +212,21 @@ class Dispatcher {
 		foreach ($_POST as $key => $val) {
 			$this->action->set($key, $val);
 		}
+	}
+
+	private function evaluateResultString($result) {
+		// find all instances of ${XXXXX} and replace with getXXXXX
+		// while you find something that looks like a directive, try to process it
+			while(preg_match(self::RESULT_EXPRESSION_REGEX, $result, $match)) {
+				// get the key which should match a public method in the action
+				$key = trim($match[1]);
+
+				$methodName = $this->action->findMethodName($key);
+				$value = $this->action->$methodName();
+				$result = str_replace($match[0], $value, $result);
+			}
+
+		return $result;
 	}
 }
 ?>
