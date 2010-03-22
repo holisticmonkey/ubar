@@ -46,7 +46,7 @@
 
 <!ELEMENT actions (action)*>
 
-<!ELEMENT action (permissionGroup?, permissions?, results?)>
+<!ELEMENT action (permissionGroup?, permissions?, results?, param*)>
 <!ATTLIST action
     name CDATA #IMPLIED
     path CDATA #IMPLIED

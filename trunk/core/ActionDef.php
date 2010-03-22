@@ -13,13 +13,14 @@ class ActionDef {
 	private $page;
 	private $section;
 	private $subSection;
+	private $params = array();
 
 	public function __construct($actionXML) {
 		$path = ((string) $actionXML['path']);
 		// use dummy action if no action defined
 		if ($path != '') {
 			$this->actionLocation = FileUtils :: dotToPath($path);
-			$this->actionClassName = FileUtils :: classFromFile($path);
+			$this->actionClassName = FileUtils :: classFromFile($this->actionLocation);
 		} else {
 			$this->actionClassName = GlobalConstants :: DUMMY_ACTION;
 		}
@@ -34,6 +35,14 @@ class ActionDef {
 		$this->permissions = $actionXML->permissions;
 		$this->name = (string) $actionXML['name'];
 
+		// add params
+		foreach ($actionXML->param as $param) {
+			$attribs = $param->attributes();
+			$name = (string) $attribs->name;
+			$value = (string) $attribs->value;
+			$this->addParam($name, $value);
+		}
+
 		// display values
 		$this->title = (string) $actionXML['title'];
 		$this->titleKey = (string) $actionXML['titleKey'];
@@ -41,6 +50,12 @@ class ActionDef {
 		$this->page = (string) $actionXML['name'];
 		$this->section = (string) $actionXML['section'];
 		$this->subSection = (string) $actionXML['subSection'];
+	}
+
+	public function addParam($name, $value) {
+		if(!array_key_exists($name, $this->params)) {
+			$this->params[$name] = $value;
+		}
 	}
 
 	public function getTemplateName() {
@@ -101,6 +116,13 @@ class ActionDef {
 					return new Result($result);
 				}
 			}
+		}
+		return null;
+	}
+
+	public function getParam($paramName) {
+		if(array_key_exists($paramName, $this->params)) {
+			return $this->params[$paramName];
 		}
 		return null;
 	}

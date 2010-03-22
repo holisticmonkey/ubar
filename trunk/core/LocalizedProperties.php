@@ -95,7 +95,7 @@ class LocalizedProperties {
 	*/
 	// TODO: remove strict and do argument inspection to allow array or just a bunch of args
 	// TODO: make it so the first argument is inspected and used as argument list if array
-	public function get($key, $arguments = array (), $strict = FALSE) {
+	public function get($key, array $arguments = array (), $strict = FALSE) {
 		$entry = $this->getSimple($key, $strict);
 		if (count($arguments) > 0) {
 			return OGNL :: get($entry, $arguments, $this->locale);

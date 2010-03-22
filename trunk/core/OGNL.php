@@ -31,12 +31,8 @@ RULES:
 	/*
 	function to process simple expression language in resource strings
 	*/
-	public static function get($string, $arguments = array(), $locale = null) {
+	public static function get($string, array $arguments = array(), $locale = null) {
 		try {
-			// if argument is not array, wrap in array
-			if(!is_array($arguments)) {
-				$arguments = array($arguments);
-			}
 
 			// array of directives to ignore because no matching argument found
 			$ignoreList = array();
