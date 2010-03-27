@@ -19,6 +19,8 @@ This guide details the steps to obtain and configure the ubar php framework.
   - model
   - properties
   - view
+    - pages
+    - templates
 }}}
   # Configure the *_/web_* folder to be the web root
   # Move *_WEB-INF/lib/ubar/install/index.php_* to *_web/index.php_*
@@ -37,6 +39,8 @@ This guide details the steps to obtain and configure the ubar php framework.
   - model
   - properties
   - view
+    - pages
+    - templates
 }}}
   # Configure the *_/web_* folder to be the web root
   # Move *_WEB-INF/lib/ubar/install/index.php_* to *_web/index.php_*
