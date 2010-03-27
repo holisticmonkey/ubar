@@ -1,0 +1,46 @@
+#summary How to install and configure ubar.
+#labels Phase-Implementation,Featured
+
+= Introduction =
+
+This guide details the steps to obtain and configure the ubar php framework.
+
+
+= Instructions =
+== Stable Releases ==
+  # Obtain the current stable build from [http://code.google.com/p/ubar/downloads/list Downloads]
+  # Set up your project with the following structure:
+{{{
+- web
+- WEB-INF
+  - controller
+  - lib
+    - ubar
+  - model
+  - properties
+  - view
+}}}
+  # Configure the *_/web_* folder to be the web root
+  # Move *_WEB-INF/lib/ubar/install/index.php_* to *_web/index.php_*
+  # Move *_WEB-INF/lib/ubar/install/.htaccess_* to *_web/.htaccess_*
+  # Edit *_WEB-INF/lib/ubar/ubar_config.properties_* uncommenting and overriding default values where necessary. Note that you you will want to set DEV_MODE to true during development.
+
+== From The Repository ==
+  # Check out the source using the instructions on [http://code.google.com/p/ubar/source/checkout Source]
+  # Set up your project with the following structure:
+{{{
+- web
+- WEB-INF
+  - controller
+  - lib
+    - ubar
+  - model
+  - properties
+  - view
+}}}
+  # Configure the *_/web_* folder to be the web root
+  # Move *_WEB-INF/lib/ubar/install/index.php_* to *_web/index.php_*
+  # Move *_WEB-INF/lib/ubar/install/.htaccess_* to *_web/.htaccess_*
+  # Rename *_WEB-INF/lib/ubar/ubar_config.properties.in_* to *_WEB-INF/lib/ubar/ubar_config.properties_*
+  # Rename *_WEB-INF/lib/ubar/ubar.xml.i_*n to *_WEB-INF/lib/ubar/ubar.xml_*
+  # Edit *_WEB-INF/lib/ubar/ubar_config.properties_* uncommenting and overriding default values where necessary. Note that you you will want to set DEV_MODE to true during development.
