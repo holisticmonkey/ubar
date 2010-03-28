@@ -1,6 +1,6 @@
 #summary Description of actions configured for views.
 
-= View Actions =
+= Introduction =
 
 View actions are actions configured to assemble data and expose it to a view. There are two primary parts to a view action, the executeInner() method and public methods that begin with "get" or "is". A variety of other methods are exposed to the view to facilitate common site or application functionality. The pertinent parts are detailed below, as is a representative sample of a view action.
 
