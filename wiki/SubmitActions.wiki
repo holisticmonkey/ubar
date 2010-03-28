@@ -1,0 +1,27 @@
+#summary Description of actions configured for user submitted input.
+
+= Introduction =
+
+Submit actions are actions configured to process and validate user input. There are a number of elements to a submit action when used properly.
+
+  * *Setters* - Functions used to assign user input to local attributes
+  * *User Input Validation* - Validation of user input for completeness and easily validated 
+    * *Adding Errors* - Add problem messages that may block execution of the action or 
+    * *Redirection To Appropriate Page to Handle User Error* - Return different results based on the error conditions and allow the dispatcher to direct you to the appropriate action.
+    * *Re-population Of Input Values* - If there's a problem with user input, indicate the problem but also re-populate form fields with the offending values.
+  ** *Error Display* - Test for, retrieve and display errors in the error view.
+  * *Action Execution* - Perform work on the user submitted input.
+  * *Add Messages* - Add notice type messages to be displayed in the next view.
+  * *Getters for Action Results* - Provide getters for appropriate action redirection. For example, if you edit a forum post, you want to return to that post after edit. To that end, it's useful to have access to the post id in the result.
+
+A variety of methods support this functionality either in the base Action or through the Dispatcher. The pertinent parts required for the generation of a submit action are detailed below, as is a representative sample of a of this action type and expected outcomes. 
+
+
+=== Methods That Should Appear In Your Action ===
+  * STUB
+
+=== Methods Inherited from the Parent Action Class ===
+  * STUB
+
+=== Result Handling ===
+  * STUB
