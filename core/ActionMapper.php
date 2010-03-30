@@ -1,14 +1,63 @@
 <?php
+/**
+ * Class definition for ActionMapper
+ * @package		core
+ */
+
+/**
+ * An encapsulation of your action definitions
+ *
+ * This class encapsulates all action definitions, templates, and global
+ * results as found in the action config, (ubar.xml). It is restricted to
+ * parsing the xml and looking up requsted values. *
+ *
+ * @author		Joshua A. Ganderson <jag@josh.com>
+ * @link		http://www.holisticmonkey.com/Framework.action
+ * @copyright	Copyright (c) 2010, Joshua A. Ganderson
+ * @license		http://www.gnu.org/licenses/gpl.html GNU General Public License v3
+ * @package		core
+ * @subpackage	containers
+ *
+ * @todo Determine how to load directly into classes instead of walking the
+ * XML tree.
+ */
 class ActionMapper {
 
+	/**
+	 * @var string The default action name to lookup when no action was found
+	 * in the URL.
+	 */
 	private $defaultActionName;
+
+	/**
+	 * @var array A collection of action XML objects.
+	 */
 	private $actions;
+
+	/**
+	 * @var array A collection of global result XML objects.
+	 */
 	private $globalResults;
+
+	/**
+	 * @var array A collection of permission XML objects.
+	 */
 	private $permissionGroups;
+
+	/**
+	 * @var array A collection of template XML objects.
+	 */
 	private $templates;
 
-	// TODO: make parsing failure be more graceful and provide meaningful feedback
-	function __construct($file) {
+	/**
+	 * Constructor for all definitions: actions, default action, global
+	 * results, templates, etc.
+	 *
+	 * @param string Path to ubar.xml file.
+	 *
+	 * @todo Make parsing failures be more graceful and provide more meaninful feedback.
+	 */
+	public function __construct($file) {
 		// convert xml of action definitions to an xml object
 		libxml_clear_errors();
 		$actionDefsXML = simplexml_load_file($file, "SimpleXMLElement", LIBXML_DTDVALID);
@@ -32,18 +81,38 @@ class ActionMapper {
 		$this->templates = $actionDefsXML->templates->template;
 	}
 
+	/**
+	 * Get the ActionDef for the given action name.
+	 *
+	 * @param string $actionName The name of the action you're looking for.
+	 *
+	 * @return class The action definition associated with the given name.
+	 *
+	 * @throws Throws and error when no definition was found with the given name.
+	 *
+	 * @todo Throw a more specific exception.
+	 */
 	public function getAction($actionName) {
 		foreach ($this->actions as $action) {
 			if ((string) $action['name'] == $actionName) {
 				return new ActionDef($action);
 			}
 		}
-		// TODO: make more specific exception
+
 		//throw new ActionNotDefinedException($actionString);
 		throw new Exception("No action definition was found with the name \"" . $actionName . "\".");
 	}
 
-	// TODO: make template errors indicate process for resolution like dot path stuff
+	/**
+	 * Get the TemplateDef for the given template name.
+	 *
+	 * @param string $templateName Name of the template you're looking for.
+	 *
+	 * @return class The template definition associated with the given name
+	 * or null if not found.
+	 *
+	 * @todo Improve error messages such that the path resolution is more clear.
+	 */
 	public function getTemplate($templateName) {
 		$returnTemplate = null;
 		foreach ($this->templates as $template) {
@@ -55,9 +124,7 @@ class ActionMapper {
 					$extendedTemplate = $this->getTemplate($template['extends']);
 
 					// merge defs
-					if (is_null($templateDef->getPath())) {
-						$templateDef->setPath($extendedTemplate->getPath());
-					}
+					$templateDef->setPath($extendedTemplate->getPath());
 					foreach ($extendedTemplate->getParams() as $name => $value) {
 						$templateDef->addParam($name, $value);
 					}
@@ -68,10 +135,31 @@ class ActionMapper {
 		return null;
 	}
 
+	/**
+	 * Get the default action definition. This is used when no action string
+	 * or file reference was found in the URL. For example,
+	 * "http://www.example.com/".
+	 *
+	 * @return class The default action definition.
+	 *
+	 * @see Dispatcher::dispatch()
+	 */
 	public function getDefaultAction() {
 		return $this->getAction($this->defaultActionName);
 	}
 
+	/**
+	 * Get the global result with the given name.
+	 *
+	 * NOTE: This is only used if the result was not found on the action
+	 * definition.
+	 *
+	 * @param string $name Name of the result you're looking for.
+	 *
+	 * @return class The result associated with the given name.
+	 *
+	 * @see Dispatcher::dispatch()
+	 */
 	public function getGlobalResult($name) {
 		// find result object
 		foreach ($this->globalResults as $result) {

@@ -20,8 +20,6 @@ class UbarTestSuite extends PHPUnit_Framework_TestSuite {
 		//$suite->addTest(new StrTest('nameasdf'));
 		$suite->addTestSuite('StrTest');
 		$suite->addTestSuite('PropertiesTest');
-		//$suite->addTestSuite('OGNLTest');
-		//$suite->addTestSuite('LocalizedPropertiesTest');
 		return $suite;
 	}
 }

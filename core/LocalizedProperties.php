@@ -98,7 +98,7 @@ class LocalizedProperties {
 	public function get($key, array $arguments = array (), $strict = FALSE) {
 		$entry = $this->getSimple($key, $strict);
 		if (count($arguments) > 0) {
-			return OGNL :: get($entry, $arguments, $this->locale);
+			return MessageFormat :: get($entry, $arguments, $this->locale);
 		}
 		return $entry;
 	}

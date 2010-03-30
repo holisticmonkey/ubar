@@ -24,8 +24,6 @@ class StrTest extends UbarBaseTestCase {
 		$this->assertEquals(1, preg_match("/\\\\b/", "\\b", $matches));
 
 		$this->assertEquals("\\.", Str :: escapeRegex("."));
-		// prove that the escape works as advertised
-
 		$this->assertEquals("\\\\b", Str :: escapeRegex("\\b"));
 		$this->assertEquals("\\\\bold\\.", Str :: escapeRegex("\\bold."));
 	}
@@ -39,7 +37,18 @@ class StrTest extends UbarBaseTestCase {
 		$this->assertEquals(".0000", Str :: formatNumber(.000001));
 	}
 
-	function test_sanitizeHTML() {}
+	function test_sanitizeHTML() {
+		// strip properties from anchor tags
+		$this->assertEquals("<a href=\"test.html\" target=\"_blank\">asdf</a>", Str :: sanitizeHTML("<a href=\"test.html\" style=\"font-size: 100px;\">asdf</a>"));
+		// strip tags that aren't allowed
+		$this->assertEquals("asdf", Str :: sanitizeHTML("<pre>asdf</pre>"));
+		// strip javascript type anchor tags
+		$this->assertEquals("asdf", Str :: sanitizeHTML("<a href=\"javascript:installVirus()\">asdf</a>"));
+		// convert newlines to breaks
+		$this->assertEquals("line1<br />\n<br />\nline2", Str :: sanitizeHTML("line1\n\nline2"));
+		// convert multiple tags
+		$this->assertEquals("<b><u>asdf</u></b>", Str :: sanitizeHTML("<b style=\"font-weight: normal\"><pre><u>asdf</u></pre></b>"));
+	}
 
 	function test_stripNewLines() {}
 }

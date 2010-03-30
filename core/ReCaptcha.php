@@ -1,5 +1,10 @@
 <?php
-/*
+/**
+ * Class definition for ReCaptcha
+ * @package		core
+ */
+
+/**
  * This is a PHP library that handles calling reCAPTCHA.
  *    - Documentation and latest version
  *          http://recaptcha.net/plugins/php/
@@ -8,10 +13,9 @@
  *    - Discussion group
  *          http://groups.google.com/group/recaptcha
  *
- * Copyright (c) 2007 reCAPTCHA -- http://recaptcha.net
- * AUTHORS:
- *   Mike Crawford
- *   Ben Maurer
+ * @copyright Copyright (c) 2007 reCAPTCHA -- http://recaptcha.net
+ * @author Mike Crawford
+ * @author Ben Maurer
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -30,6 +34,7 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
+ *
  */
 
 /**
@@ -39,11 +44,15 @@ define("RECAPTCHA_API_SERVER", "http://api.recaptcha.net");
 define("RECAPTCHA_API_SECURE_SERVER", "https://api-secure.recaptcha.net");
 define("RECAPTCHA_VERIFY_SERVER", "api-verify.recaptcha.net");
 
+/**
+ * @package		core
+ * @subpackage	utils
+ */
 class ReCaptcha {
 	/**
 	 * Encodes the given data into a query string format
-	 * @param $data - array of string elements to be encoded
-	 * @return string - encoded request
+	 * @param array $data An rray of string elements to be encoded.
+	 * @return string  encoded request
 	 */
 	public static function _recaptcha_qsencode($data) {
 		$req = "";
@@ -60,7 +69,7 @@ class ReCaptcha {
 	 * @param string $host
 	 * @param string $path
 	 * @param array $data
-	 * @param int port
+	 * @param int $port
 	 * @return array response
 	 */
 	public static function _recaptcha_http_post($host, $path, $data, $port = 80) {
@@ -98,7 +107,7 @@ class ReCaptcha {
 	 * @param string $error The error given by reCAPTCHA (optional, default is null)
 	 * @param boolean $use_ssl Should the request be made over ssl? (optional, default is false)
 
-	 * @return string - The HTML to be embedded in the user's form.
+	 * @return string The HTML to be embedded in the user's form.
 	 */
 	public static function recaptcha_get_html($pubkey, $error = null, $use_ssl = false) {
 		if ($pubkey == null || $pubkey == '') {

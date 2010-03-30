@@ -1,10 +1,34 @@
 <?php
+/**
+ * Miscelaneous Functions
+ *
+ * Misc functions that should be moved to more specific collections. As the
+ * list of functions is currently very limited, they are being left here.
+ *
+ * @author		Joshua A. Ganderson <jag@josh.com>
+ * @link		http://www.holisticmonkey.com/Framework.action
+ * @copyright	Copyright (c) 2010, Joshua A. Ganderson
+ * @license		http://www.gnu.org/licenses/gpl.html GNU General Public License v3
+ * @package		core
+ * @subpackage	functions
+ */
 
-// magic auto-loader function that tries to load classes that are in the allowed list
-// TODO: allow user to specify an autoload directory
-// TODO: also look for stuff in the path and pear classes http://php.net/manual/en/language.oop5.autoload.php
-// TODO: switch to using spl autoload so you can register multiple autoloaders and lib implementers can use it
-// 		 http://www.php.net/manual/en/function.spl-autoload.php
+/**
+ * Magic autoloader override.
+ *
+ * This is used to autoload classes in known class folders. The global $classes
+ * variable contains the list of classes to search.
+ *
+ * @param string $className Name of the class you're attempting to load.
+ * @throws Exception when unable to load a given class.
+ *
+ * @todo Also look for stuff in the path and pear classes
+ * http://php.net/manual/en/language.oop5.autoload.php
+ * @todo Switch to using spl autoload so you can register multiple autoloaders
+ * and lib implementers can use it
+ * see - http://www.php.net/manual/en/function.spl-autoload.php
+ *
+ */
 function __autoload($className) {
 	global $classes;
 	$filename = $className . ".php";
@@ -17,7 +41,13 @@ function __autoload($className) {
 	}
 }
 
-// get files allowed to be auto loaded
+/**
+ * Assign folders as search locations for class autoloading.
+ *
+ * @param string $directory Directory to add to search list.
+ * @param boolean $recursive Whether the search directory should be recursively
+ * added to search list.
+ */
 function getClassPaths($directory, $recursive = FALSE) {
 	global $classes;
 
@@ -34,12 +64,22 @@ function getClassPaths($directory, $recursive = FALSE) {
 	}
 }
 
-// TODO: honor html_errors ini settings, wrap around div statements, have html and non html message versions and use sprintf for args
-// TODO: move presentation elsewhere
-// TODO: make an error object with the pertinent properties
-// TODO: don't echo, push into a collection of error objects that (remember to use type hinting) that is displayed on an error page
-// TODO: figure out how to send to another page when you want to catch all errors before redirecting... can you listen for completion of scripting and
-// TODO: if this error happens before a page is rendered, may get xhtml parse error since not wrapped in a document, consider trying to set header to html (if xhtml) in a try catch, prepending with <html><document> if doesn't fail
+/**
+ * Custom error handler. For the most part it addresses formatting issues.
+ *
+ * @param integer $typeNumber Index of error type.
+ * @param string $message Error message.
+ * @param string $file File path.
+ * @param integer $line Line number.
+ * @param array $variables Variables in context. Currently not used due to
+ * verbosity.
+ *
+ * @return boolean True, so ask to skip PHP internal error handler.
+ *
+ * @todo Honor html_errors ini settings using sprintf to substitute into string templates.
+ * @todo Make an error object with pertinent settings.
+ * @todo If error happens before page is rendered, may get xhtml parse error since not wrapped in document.
+ */
 function errorHandler($typeNumber, $message, $file, $line, $variables) {
 	echo "<div style=\"padding: 20px; margin-bottom: 10px; font-family: monospace; font-size: 16px; border: 2px solid #FF0000; background :#FFCC00; white-space: pre;\">";
 
@@ -72,6 +112,15 @@ function errorHandler($typeNumber, $message, $file, $line, $variables) {
 	return true;
 }
 
+/**
+ * Custom exception handler. For the most part it addresses formatting issues.
+ *
+ * @param class $e Exception to render
+ *
+ * @return boolean True, so ask to skip PHP internal error handler.
+ *
+ * @todo Honor html_errors ini settings using sprintf to substitute into string templates.
+ */
 function exceptionHandler($e) {
 	echo "<div style=\"padding: 20px; margin-bottom: 10px; font-family: monospace; font-size: 16px; border: 2px solid #FF0000; background :#FFCC00; white-space: pre;\">";
 	echo '<strong>Uncaught ' . get_class($e) . '</strong> (' . $e->getCode() . ")\n\n";
@@ -81,6 +130,12 @@ function exceptionHandler($e) {
 	echo "</div>";
 }
 
+/**
+ * Developers convenience method for printing an object to screen. Only renders
+ * if DEV_MODE is on to prevent accidental exposure on production sites.
+ *
+ * @param class $object Object to render.
+ */
 function debug($object) {
 	if (DEV_MODE) {
 		if (is_object($object) || is_array($object)) {
