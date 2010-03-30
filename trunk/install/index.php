@@ -1,18 +1,16 @@
 <?
 /**
-* Ubar Framework Setup Script
-*
-* This script sets up the Ubar Framework each requeest. Initialization,
-* flow control and dispatching is handled on separate scripts launched from
-* here. All requests are funneled through this  mod_rewrite and .htaccess.
-*
-* @author     Josh Ganderson <jag@josh.com>
-* @link       http://www.holisticmonkey.com
-* @license    http://opensource.org/licenses/bsd-license.php BSD License
-* @copyright  Copyright 2009 Joshua Ganderson
-* @since      2009
-* @version    $Rev$
-* @package    Core
+ * Ubar Framework Setup Script
+ *
+ * This script sets up the Ubar Framework each request. Initialization,
+ * flow control and dispatching is handled on separate scripts launched from
+ * here. All requests are funneled through this mod_rewrite and .htaccess.
+ *
+ * @author		Joshua A. Ganderson <jag@josh.com>
+ * @link		http://www.holisticmonkey.com/Framework.action
+ * @copyright	Copyright (c) 2010, Joshua A. Ganderson
+ * @license		http://www.gnu.org/licenses/gpl.html GNU General Public License v3
+ * @package		core
 */
 
 ############## USER EDIT ##############

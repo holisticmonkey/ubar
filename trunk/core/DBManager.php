@@ -1,20 +1,43 @@
 <?php
+/**
+ * Class definition for DBManager
+ * @package		core
+ */
 
-/* NOTE: this db manager is rudimentary at this time but is required for the built in user management.
- * If you use multiple databases or doing extensive db work, you may want to disable this for the time being.
+/**
+ * Manager for database connectivity and schema versioning.
  *
- * Notable features are bootstrapping the database and supporting schema versioning/migration.
-*/
-// TODO: have DB specific exceptions?
-// TODO: have class bootstrap framework specific tables for metainfo storage
+ * This class manages connectivity to a mysql database, provides helper
+ * methods, and supports db bootstrapping and automatic schema versioining.
+ *
+ * NOTE: This manager is rudimentary compared to a variety that exist elsewhere
+ * and it is limited to mysql. If you are doing extensive db work, you may want
+ * to disable the use of this in ubar_config.properties.
+ *
+ *
+ * @author		Joshua A. Ganderson <jag@josh.com>
+ * @link		http://www.holisticmonkey.com/Framework.action
+ * @copyright	Copyright (c) 2010, Joshua A. Ganderson
+ * @license		http://www.gnu.org/licenses/gpl.html GNU General Public License v3
+ * @package		core
+ * @subpackage	utils
+ *
+ * @todo Add database specific exceptions.
+ */
 class DBManager {
 
+	/**
+	 * @var class Link to the mysql database.
+	 */
 	private $link;
 
-	// TODO: get version from properties
-	private $version = 2;
-
-	// 	construct from predefined values if defined
+	/**
+	 * Initialize database connection with arguments defined in
+	 * ubar_config.properties
+	 *
+	 * @throws An exception when it was unable to connect to the database.
+	 * @throws An exception when required fields were not defined.
+	 */
 	public function __construct() {
 		if (defined("DB_SERVER") && defined("DB_USERNAME") && defined("DB_PASSWORD") && defined("DB_NAME")) {
 			$result = $this->connect(DB_SERVER, DB_USERNAME, DB_PASSWORD, DB_NAME, true);
@@ -26,7 +49,20 @@ class DBManager {
 		}
 	}
 
-	// connect to a database and store the link. returns true if connceted to mysql/db depending on params
+	/**
+	 * Connect to a mysql database with the given values.
+	 *
+	 * @param string $server Name of the server to connect to.
+	 * @param string $user Username to conenct with.
+	 * @param string $pass Password to connect with.
+	 * @param string $dbName Name of the database to connect to.
+	 * @param boolean $createIfNotExists Create the database if it doesn't
+	 * already exist? Defaults to false.
+	 *
+	 * @return boolean True if successful.
+	 *
+	 * @throws An exception if it could not connect to the server or db.
+	 */
 	public function connect($server, $user, $pass, $dbName, $createIfNotExists = false) {
 		// exit if already connected
 		if (!is_null($this->link)) {
@@ -57,6 +93,18 @@ class DBManager {
 		return true;
 	}
 
+	/**
+	 * Execute a file as sql statements.
+	 *
+	 * @param string $file Path to file to execute.
+	 *
+	 * @return boolean Return true if successful.
+	 *
+	 * @throws An exception if the file does not exist.
+	 * @throws An exception if unable to get the contents of the file.
+	 * @throws An exception if unable to execute one or more of the sql
+	 * statements.
+	 */
 	public function runFile($file) {
 		if (!file_exists($file)) {
 			throw new Exception("File $file does not exist.");
@@ -80,8 +128,20 @@ class DBManager {
 		return true;
 	}
 
-	// WARNING: experimental feature, may be moved out of framework due to number of site specific variables
-	// NOTE: assumes schema versioning in framework specific format, will not function otherwise
+	/**
+	 * Get schema version. This requires ubar specific table to be created and versioning is
+	 * handled through the naming convention of .sql files and a version entry
+	 * in ubar_config.properties.
+	 *
+	 * If the table is not present, this method will attempt to bootstrap the
+	 * table using bootstrap.sql.
+	 *
+	 * WARNING: This is an experimental feature and it should be used with care. Backup
+	 * your database periodically if you are concerned about your data.
+	 *
+	 * @return intenger The current version of your schema. Defaults to 0 if no
+	 * entry found in the database.
+	 */
 	public function getVersion() {
 		$result = mysql_query("SHOW TABLES LIKE 'ubarmetainfo'");
 		if (!$result) {
@@ -106,6 +166,18 @@ class DBManager {
 	}
 
 	// only tries to update schema if current version and path to upgrade sql files are defined
+	/**
+	 * Check and update the schema version if necessary.
+	 *
+	 * While your database version is below the currently specified version in
+	 * ubar_config.properties, it will use your SCHEMA_PATH naming convention
+	 * to run schema files sequentially.
+	 *
+	 * @see DBManager::getVersion()
+	 *
+	 * @throws An exception if unable to update the schema version in the
+	 * metainfo table.
+	 */
 	public function checkVersion() {
 		if (defined("SCHEMA_PATH") && defined("SCHEMA_VERSION") && !is_null(SCHEMA_PATH) && !is_null(SCHEMA_VERSION)) {
 			$version = $this->getVersion();
@@ -124,15 +196,33 @@ class DBManager {
 		}
 	}
 
+	/**
+	 * Get the database link.
+	 *
+	 * @return class The database link.
+	 */
 	public function getLink() {
 		return $this->link;
 	}
 
+	/**
+	 * Get the last mysql error number and string.
+	 *
+	 * @return string The error message.
+	 */
 	public function getLastError() {
 		return mysql_errno($this->link) . ": " . mysql_error($this->link);
 	}
 
 	//properly escapes a string, taking into account the connection's character set and whether magic quotes is on
+	/**
+	 * Escape a string for entry into the databse. This takes into account
+	 * whether magic quotes is on.
+	 *
+	 * @param string $string The string for use in a query.
+	 *
+	 * @return string The escaped string.	 *
+	 */
 	public function escapeString($string) {
 		// if magic quotes is on, strip slashes to avoid double escape
 		if(get_magic_quotes_gpc()) {

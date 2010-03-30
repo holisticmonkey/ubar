@@ -182,10 +182,8 @@ class Dispatcher {
 			if (!file_exists($templateRealPath) || is_dir($templateRealPath)) {
 				throw new Exception("The template file \"" . $templateRealPath . "\", from template def, \"" . $templateName . "\", is not a valid file.");
 			}
-			// TODO: insert properties of template def into scope
+			// set template for action and init template values
 			$this->action->setTemplateDef($templateDef);
-			// init of values into action separate since only applicable to View for now
-			$this->action->initTemplateValues();
 
 			// NOTE: templates must call renderBody() in order to retrieve page content
 			require_once ($templateRealPath);

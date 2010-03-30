@@ -1,36 +1,93 @@
 <?
-/*
-Simple expression processing on message bundle messages based on OGNL syntax.
-*/
-class OGNL {
-/*
-RULES:
-{0} replace with first element in arguments
-{asdf} replace with whatever element of arguments that has 'asdf' for key iin argument array
-{0,number,integer} - locale specific number formatting, in this case to be processed as integer
-{0,choice,0#dogs|1#dog|1<dogs} - do test on argument 0 to determine which of the choices to fall through to
-*/
-//TODO: complete date formatting
-//TODO: complete math stuff
-//TODO: support argument that's not an array
-//TODO: determine what happens when a choice condition is not satisfied
-//TODO: add logging
-//TODO: determine what happens when a nested directive fails to be substituted because no matching argument found
-//TODO: determine what should happen when string is empty
-//TODO: cache results in case same thing is being called a bunch of times - example, lookup for link lable displayed on every line of a record set
+/**
+ * Class definition for MessageFormat
+ * @package		core
+ */
 
-	// multiline, extra analysis, utf-8, ungreedy
-	// regex to get smallest ognl directive match that doesn't contain another directive - used iteratively to allow for nested directives
-		// ex. {0,choice,0#dogs|1#dog|1<dogs}
-	const replaceRegex = '/{([^{,]+)(,[^{]*){0,1}}/mSuU';
+/**
+ * Message formatting utilities
+ *
+ * The class, MessageFormat, performs simple expression processing on message
+ * bundle messages based on MessageFormat syntax.
+ *
+ * RULES:
+ * <ul>
+ * <li>{0} replace with first element in arguments</li>
+ * <li>{asdf} replace with whatever element of arguments that has 'asdf' for
+ * key iin argument array</li>
+ * <li>{0,number,integer} - locale specific number formatting, in this case to
+ * be processed as integer</li>
+ * <li>{0,choice,0#dogs|1#dog|1<dogs} - do test on argument 0 to determine
+ * which of the choices to fall through to</li>
+ * </ul>
+ *
+ * @author		Joshua A. Ganderson <jag@josh.com>
+ * @link		http://www.holisticmonkey.com/Framework.action
+ * @copyright	Copyright (c) 2010, Joshua A. Ganderson
+ * @license		http://www.gnu.org/licenses/gpl.html GNU General Public License v3
+ * @package		core
+ * @subpackage	utils
+ *
+ * @todo Complete data formatting.
+ * @todo Complete math evaluation.
+ * @todo Determine what to dowith choice conditions that are not satisfied.
+ * @todo Cache results if same thing is called a number of times... though
+ * might be best to do outside of this class.
+ */
+class MessageFormat {
 
-	// regex to split choice instructions into component parts - compare value, comparator, resulting condition
-		// ex. 0#dogs|1#dog|1<dogs
-	const choiceRegex = '/([^#><\|]+)([#><]{1})([^\|]*)/mSu';
+	/**
+	 * Regular expression to get smallest message format directive that
+	 * doesn't contain another directive. Used iteratively to allow for nested
+	 * directives.
+	 *
+	 * Modifiers: multiline, extra analysis, utf-8, ungreedy
+	 *
+	 * Example: {0,choice,0#dogs|1#dog|1<dogs}
+	 */
+	const REPLACE_REGEX = '/{([^{,]+)(,[^{]*){0,1}}/mSuU';
 
-	/*
-	function to process simple expression language in resource strings
-	*/
+	/**
+	 * Regular expression to split choice instructions into component parts:
+	 * compare value, comparator, resulting condition.
+	 *
+	 * Modifiers: multiline, extra analysis, utf-8
+	 *
+	 * Example: 0#dogs|1#dog|1<dogs
+	 */
+	const CHOICE_REGEX = '/([^#><\|]+)([#><]{1})([^\|]*)/mSu';
+
+	/**
+	 * A marker for the start of an invalid expression. Used to prevent further
+	 * expression evaluation of a known invalid expression.
+	 *
+	 * @see MessageFormat::ignore()
+	 */
+	const MSG_IGNORE_START = 'UBAR_MARKER_';
+
+	/**
+	 * A marker for the end of an invalid expression. Used to prevent further
+	 * expression evaluation of a known invalid expression.
+	 *
+	 * @see MessageFormat::ignore()
+	 */
+	const MSG_IGNORE_END = '_UBAR_MARKER';
+
+	/**
+	 * Format a message using message formatting rules, the provided
+	 * arguments and the provided locale.
+	 *
+	 * The locale influences numeric formatting, time formatting and monetary
+	 * formatting. Note that this has been disabled until test servers are at
+	 * least PHP 5.3.
+	 *
+	 * @param string $string String to format.
+	 * @param array $arguments Arguments used to format or substitute into
+	 * message.
+	 * @param class $locale Overriding locale object.
+	 *
+	 * @return string Formatted string.
+	 */
 	public static function get($string, array $arguments = array(), $locale = null) {
 		try {
 
@@ -38,7 +95,7 @@ RULES:
 			$ignoreList = array();
 
 			// while you find something that looks like a directive, try to process it
-			while(preg_match(self::replaceRegex, $string, $match)) {
+			while(preg_match(self::REPLACE_REGEX, $string, $match)) {
 				// get the key which should match an argument
 				$key = trim($match[1]);
 				// value from arguments matching key
@@ -93,14 +150,35 @@ RULES:
 		return $string;
 	}
 
-	// ignore a directive because it was invalid or does not have a matching argument
+	/**
+	 * Ignore an invalid expression. This method substitutes an invalid
+	 * expression with a reasonably unique identifier, forestalling further
+	 * expression parsing. It is later substited back into the message having
+	 * escaped html chars.
+	 *
+	 * @param string $invalidExpression Invalid expression or expression
+	 * without a matching argument.
+	 * @param array $ignoreList List of ignored expressions.
+	 * @param string $string Message to be formatted.
+	 */
 	private static function ignore($invalidExpression, &$ignoreList, &$string) {
-		$replaceMarker = 'OGNL_MARKER_' . count($ignoreList) .  '_OGNL_MARKER';
+		$replaceMarker = MSG_IGNORE_START . count($ignoreList) .  MSG_IGNORE_END;
 		$string = str_replace($invalidExpression, $replaceMarker, $string);
 		$ignoreList[$replaceMarker] = $invalidExpression;
 	}
 
-	// try to evaluate expression of directive
+	/**
+	 * Process a single set of instructions with the given value and locale.
+	 *
+	 * @param mixed $value Value to substitute in or use for expression
+	 * evaluation.
+	 * @param string $instructions Instructions to evaluate with given value.
+	 * @param class @locale Overriding locale used is number, monetary, and
+	 * date time formatting. Note that this is currently disabled.
+	 *
+	 * @return string Processed instruction with value.
+	 *
+	 */
 	private static function processValue($value, $instructions, $locale = null) {
 		$returnString = NULL;
 		$type = NULL;
@@ -132,7 +210,7 @@ RULES:
 			// TODO: figure out how do do ranges and more complex conditions - is this accomplished by most difficult match with < and >?
 
 			// split choice conditions into component parts
-			preg_match_all(self::choiceRegex, $modifiers, $matches);
+			preg_match_all(self::CHOICE_REGEX, $modifiers, $matches);
 			// holders of max and min values in > < comparisons so that the most extreme matches win if more than one
 			$compositeMin = NULL;
 			$compositeMax = NULL;
