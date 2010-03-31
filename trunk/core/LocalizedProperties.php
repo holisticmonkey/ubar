@@ -1,40 +1,92 @@
 <?
+/**
+ * Class definition for LocalizedProperties
+ * @package core
+ */
 
-
-// TODO: make a generic property accessor that this is a wrapper for that knows what files to look for
-
-// regex resources for property matching
-define('PROP_VALUE_REGEX_PREPEND', '/^\s*');
-// NOTE: modifiers are multiline, extra analysis since reused, and utf-8 compatible
-// NOTE: only zero or one white spaces after the "=" are stripped from the match so that you can get spaces before your string...
-define('PROP_VALUE_REGEX_APPEND', '\s*=\s{0,1}(.*)$/mSu');
-
+/**
+ * Interface to a locale specific properties.
+ *
+ * The class, LocalizedProperties, gets a locale specific properties file and
+ * merges it with a default properties file. Properties may be retrieved with
+ * expression evaluation and argument substitution.
+ *
+ * Prior to the 1.0 release of this framework, this will also support locale
+ * specific number, money and time formatting.
+ *
+ * @author		Joshua A. Ganderson <jag@josh.com>
+ * @link		http://www.holisticmonkey.com/Framework.action
+ * @copyright	Copyright (c) 2010, Joshua A. Ganderson
+ * @license		http://www.gnu.org/licenses/gpl.html GNU General Public License v3
+ * @package		core
+ * @subpackage	utils
+ *
+ * @todo Consider caching.
+ * @todo see http://en.wikipedia.org/wiki/.properties for other rules for
+ * compatability with standards.
+ */
 class LocalizedProperties {
-	// path to translation files - may come from constant or set in instantiation
+
+	/**
+	 * @var string Path to localized properties files.
+	 */
 	private $path;
 
-	// locale to use to find properties file
+	/**
+	 * @var class Locale to use for primary properties file lookup and
+	 * money/numeric/time formatting.
+	 */
 	private $locale;
 
-	// file to read properties from
+	/**
+	 * @var string Contents of file to read properties from.
+	 */
 	private $properties;
 
-	// default file to get properties from if not found in locale specific
+	/**
+	 * @var string Contents of default properties file if key not found in $properties.
+	 * @see LocalizedProperties::$properties
+	 */
 	private $defaultProperties;
 
-	// TODO: handle naming convention for properties files
-	// TODO: figure out how override should happen
-	private $propertiesPrepender = "resources";
 
-	private $propertiesAppender = ".properties";
+	/**
+	 * Appender for all properties file names.
+	 */
+	const PROPERTIES_APPENDER = ".properties";
 
+	/**
+	 * A prepend string for the dynamic property regular expression.
+	 */
+	const PROP_VALUE_REGEX_PREPEND = '/^\s*';
+
+	/**
+	 * Appender for regular expression to extract the value from a property line.
+	 *
+	 * Modifiers: multiline, extra analysis, utf-8
+	 *
+	 * Example: key = message
+	 *
+	 * NOTE: only zero or one white spaces after the "=" are stripped from the
+	 * match so that you can get spaces before your string...
+	 */
+	const PROP_VALUE_REGEX_APPEND = '\s*=\s{0,1}(.*)$/mSu';
+
+	/**
+	 * @var boolean $isDefault Flag indicating that the properties file used
+	 * is the default properties file.
+	 */
 	private $isDefault = false;
 
-	// safe check for dev mode
-	// TODO: figure out why this doesn't work
-	//var $devMode = (defined('DEV_MODE') && DEV_MODE) ? true : false;
-	private $devMode = true;
-
+	/**
+	 * Construct a localized properties instance with the given locale and
+	 * path. The path is only used as an override and should not be used
+	 * regularly.
+	 *
+	 * @param class $locale Locale to use for properties file lookup and
+	 * formatting.
+	 * @param string $path Override to path to properties files.
+	 */
 	public function __construct($locale = NULL, $path = NULL) {
 		// use properties root if exists and no override specified
 		if ((!isset ($path) || is_null($path)) && defined('PROPERTIES_PATH')) {
@@ -51,15 +103,17 @@ class LocalizedProperties {
 			// TODO: make it not throw an error if pear package not installed for localization
 			// TODO: either use php 5.3 or PEAR i18n
 			//$this->locale = Locale::parseLocale($locale);
+			$this->locale = $locale;
 			//die(print_r($this->locale));
 		} else
 			if (defined(LOCALE)) {
+				// TODO: convert to Locale instance
 				$this->locale = LOCALE;
 			}
 		// TODO: check if valid locale
 
 		// make sure that default properties file exists
-		$defaultPath = $path . $this->propertiesPrepender . $this->propertiesAppender;
+		$defaultPath = $path . PROPERTIES_ROOT . self::PROPERTIES_APPENDER;
 		if (!file_exists($defaultPath)) {
 			throw new Exception('Default properties file \'' . $defaultPath . '\' does not exist.');
 		}
@@ -71,7 +125,7 @@ class LocalizedProperties {
 			// else, try to get localized properties file
 		} else {
 			$this->defaultProperties = file_get_contents($defaultPath);
-			$localizedPath = $path . $this->propertiesPrepender . "_" . $this->locale . $this->propertiesAppender;
+			$localizedPath = $path . PROPERTIES_ROOT . "_" . $this->locale . self::PROPERTIES_APPENDER;
 			// if localized file doesn't exist, set default as primary and log that couldn't find localized property file
 			if (!file_exists($localizedPath)) {
 				//throw new Exception('Properties file \'' . $propertiesPath . '\' does not exist.');
@@ -83,18 +137,20 @@ class LocalizedProperties {
 			}
 		}
 		// strip comments - this is anything where the first non whitespace is #
-		// TODO: see http://en.wikipedia.org/wiki/.properties for other rules
 		$this->properties = preg_replace(Properties::PROP_COMMENT_REGEX, "", $this->properties);
 	}
 
-	/*
-	function to get internationalized resource and do simple expression language processing
-		$key - key used to retrive message
-		$arguments - array of values or single value to use with expression processing
-		$strict - whether to throw an error if message not found
-	*/
-	// TODO: remove strict and do argument inspection to allow array or just a bunch of args
-	// TODO: make it so the first argument is inspected and used as argument list if array
+	/**
+	 * Get value for for a given key and arguments. This uses message
+	 * formatting to substitute arguments or parse simple expressions.
+	 *
+	 * @param string $key Key to use for message lookup.
+	 * @param array $arguments Arguments to use for expression evaluation and
+	 * substitution.
+	 * @param boolean $strict Whether to throw an error when key not found.
+	 *
+	 * @return string Processed message.
+	 */
 	public function get($key, array $arguments = array (), $strict = FALSE) {
 		$entry = $this->getSimple($key, $strict);
 		if (count($arguments) > 0) {
@@ -103,12 +159,22 @@ class LocalizedProperties {
 		return $entry;
 	}
 
+	/**
+	 * Get value for a given key but do no expression evaluation.
+	 *
+	 * @param string $key Key to use for message lookup.
+	 * @param boolean $strict Whether to throw an error when key not found.
+	 *
+	 * @return string Message.
+	 *
+	 * @throws Exception if key not found and $strict == true.
+	 */
 	private function getSimple($key, $strict = FALSE) {
 		// if null, empty, or starts with comment sequence  of '#" or '//' - fail
 		// if in dev mode, check to see if exists multiple times and fail saying invalid property file
 		//use preg_match_all
 		// get regular expresion for matching key
-		$regex = PROP_VALUE_REGEX_PREPEND . Str :: escapeRegex($key) . PROP_VALUE_REGEX_APPEND;
+		$regex = self::PROP_VALUE_REGEX_PREPEND . Str :: escapeRegex($key) . self::PROP_VALUE_REGEX_APPEND;
 		// find resource
 		preg_match($regex, $this->properties, $matches);
 		// if found, return it
