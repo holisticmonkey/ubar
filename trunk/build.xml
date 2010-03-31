@@ -1,39 +1,101 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<project name="ubar">
+<project name="ubar" default="package" basedir=".">
+	
+	<!-- get build properties such as version number -->
 	<property file="build.properties"/>
 	
-	<target name="install" description="Install framework to site">
-		<!-- take arguments, copy to directory, modify .in files with necessary arguments -->
-		
-	</target>
+	<!-- provide access to environment variables -->
+	<property environment="env" />
+
+	<!-- reused folders -->
+	<property name="dist.dir" value="${basedir}/dist" />
+	<property name="build.dir" value="${basedir}/build" />
+	<property name="test.dir" value="${basedir}/test" />
+	<property name="lib.build.dir" value="${build.dir}/lib/ubar" />
+	<property name="sample.dir" value="${dist.dir}/sample" />
+	<property name="docs.output.dir" value="${dist.dir}/docs" />
+	
+	<!-- reused file names -->
+	<property name="package.name" value="ubar-${framework.version}.zip" />
+	<property name="config.name" value="ubar_config.properties" />
+	<property name="actiondefs.name" value="ubar.xml" />
 	
 	<target name="test" description="Run all phpunit tests">
-	
+		<echo>Running PHPUnit tests</echo>
 	</target>
 	
+	<!-- NOTE: This requires that you have installed phpDocumentor using pear
+	and set an environment variabe PEAR_HOME to the location of your pear
+	directory -->
 	<target name="generate-docs" description="Generate documentation">
-		<!-- clear anything that looks like docs in the dist directory -->
+		<echo>=== Generating documentation with phpDocumentor for Ubar version ${framework.version} ===</echo>
+
+		<!-- clear out old docs -->
+		<delete dir="${docs.output.dir}" />
+		<mkdir dir="${docs.output.dir}" />
 		
 		<!-- generate html docs for hosting -->
-		
-		<!-- generate pdfdocs with version for hosting on code site -->
-		
-		<!-- generate full docs for developer distribution including private and test -->
-		
+		<exec executable="php">
+			<arg value="${env.PEAR_HOME}/PhpDocumentor/phpDocumentor/phpdoc.inc" />
+			<arg value="--target" />
+			<arg value="${docs.output.dir}" />
+			<arg value="--output" />
+			<arg value="HTML:frames:default" />
+			<arg value="--directory" />
+			<arg value="${basedir}" />
+			<arg value="--ignore" />
+			<arg value="${basedir}/test*" />
+			<arg value="--title" />
+			<arg value="Ubar PHP MVC Framework Documentation" />
+			<arg value="--parseprivate" />
+		</exec>
 	</target>
 	
-	<target name="compress" description="Compress files for distribution">
-		<property name="dist-name" value="ubar-framework-${volumeValidator.version}.zip" />
+	<target name="build-source" description="Package source files">
+		<!-- re-init lib build dir -->
+		<delete dir="${lib.build.dir}" />
+		<mkdir dir="${lib.build.dir}" />
 		
-		<!-- zip files for distribution, get version for file name -->
-	
+		<!-- copy files over -->
+		<copy todir="${lib.build.dir}">
+			<fileset dir="${basedir}">
+				<exclude name="dist/"/>
+				<exclude name="build/"/>
+				<exclude name="test/"/>
+				<exclude name="build.properties"/>
+				<exclude name="${config.name}*"/>
+				<exclude name="${actiondefs.name}*"/>
+				<exclude name="README"/>
+			</fileset>
+		</copy>
+
+		<!-- copy .in files to build directory for inclusion in archive -->
+		<copy file="${config.name}.in" tofile="${lib.build.dir}/${config.name}"/>
+		<copy file="${actiondefs.name}.in" tofile="${lib.build.dir}/${actiondefs.name}"/>
 	</target>
 	
-	<target name="package" description="Package project for distribution">
-		<!-- copy and modify resources to temp directory for compression to dist -->
+	<target name="package" description="Package project for distribution" depends="test,generate-docs,build-source">
+		<!-- delete last package -->
+		<delete failonerror="false" file="${dist.dir}/${package.name}" />
 		
-		<!-- delete temp resources -->
+		<!-- copy README to root instead of being in lib -->
+		<copy file="${basedir}/README" tofile="${build.dir}/README"/>
 		
+		<!-- zip contents of build dir -->
+		<zip
+			destfile="${dist.dir}/${package.name}"
+			basedir="${build.dir}"
+		/>
+		
+		<!-- merge in docs already in dist dir -->
+		<zip
+			update="true"
+			destfile="${dist.dir}/${package.name}"
+			basedir="${dist.dir}"
+			includes="docs/**"
+		/>
+		
+		<delete dir="${build.dir}" />
 	</target>
 </project>
