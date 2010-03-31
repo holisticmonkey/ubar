@@ -52,7 +52,7 @@ class Test extends Acton {
 		
 		// get a message from your resources.properties file with the key, 
 		// testpage.text.myMessage, and using the value, 2, for {numFish} in the message
-		$this->getProperties()->get('testpage.text.myMessage', array('numFish' => 2));
+		$this->message = $this->getProperties()->get('testpage.text.myMessage', array('numFish' => 2));
 		
 		return GlobalConstants::SUCCESS;
 	}
