@@ -15,6 +15,7 @@
 	<property name="lib.build.dir" value="${build.dir}/lib/ubar" />
 	<property name="sample.dir" value="${dist.dir}/sample" />
 	<property name="docs.output.dir" value="${dist.dir}/docs" />
+	<property name="logs.dir" value="${basedir}/logs" />
 	
 	<!-- reused file names -->
 	<property name="package.name" value="ubar-${framework.version}.zip" />
@@ -23,6 +24,12 @@
 	
 	<target name="test" description="Run all phpunit tests">
 		<echo>Running PHPUnit tests</echo>
+		
+		<mkdir dir="${logs.dir}" />
+		
+		<exec dir="${test.dir}" executable="phpunit.bat" failonerror="true">
+			<arg line="--log-junit ${logs.dir}/UbarTestSuite.xml  --verbose UbarTestSuite" />
+		</exec>
 	</target>
 	
 	<!-- NOTE: This requires that you have installed phpDocumentor using pear
