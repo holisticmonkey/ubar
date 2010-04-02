@@ -144,122 +144,161 @@ abstract class Action {
 		/**
 		 * Pass through to public methods in your action.
 		 *
-		 * @param string $methodName Name of the method you want to call.
-		 * May be preceded by "get" or "is".
+		 * As this section defines global function for page access,
+		 * constructing a second action in the same call would cause an error
+		 * indicating that the function was already defined. This is typically
+		 * not a problem as there is no reason to define two actions in the
+		 * same request. However, action tests typically DO setup more than one
+		 * action. For this reason, they is protected from re-declaration by
+		 * checking for the existance of the "get" function.
+		 *
+		 * @see UbarBaseActionTestCase
 		 */
-		function get($methodName) {
-			global $action;
-			$methodName = $action->findMethodName($methodName);
-			return $action-> $methodName ();
-		}
+		if(!function_exists("get")) {
+			function get($methodName) {
+				global $action;
+				$methodName = $action->findMethodName($methodName);
+				return $action-> $methodName ();
+			}
 
-		function getTxt($key, $arguments = array ()) {
-			global $action;
-			// TODO: use dynamic arg retrieval and inspection
-			//$args = func_num_args();
-			return $action->getProperties()->get($key, $arguments, DEV_MODE);
-		}
+			function getTxt($key, $arguments = array ()) {
+				global $action;
+				// TODO: use dynamic arg retrieval and inspection?
+				//$args = func_num_args();
+				return $action->getProperties()->get($key, $arguments, DEV_MODE);
+			}
 
-		function getParam($key) {
-			global $action;
-			return $action->getParam($key);
-		}
+			function getParam($key) {
+				global $action;
+				return $action->getParam($key);
+			}
 
-		// ACTION CONFIG INFO
-		// get name of action
-		function getActionName() {
-			global $actionDef;
-			return $actionDef->getName();
-		}
+			// ACTION CONFIG INFO
+			// get name of action
+			function getActionName() {
+				global $actionDef;
+				return $actionDef->getName();
+			}
 
-		// get class name defined for action
-		function getActionClassName() {
-			global $actionDef;
-			return $actionDef->getClassName();
-		}
+			// get class name defined for action
+			function getActionClassName() {
+				global $actionDef;
+				return $actionDef->getClassName();
+			}
 
-		// get view path
-		function getViewPath() {
-			global $view;
-			return $view;
-		}
+			// get view path
+			function getViewPath() {
+				global $view;
+				return $view;
+			}
 
-		// MESSAGE UTILS PASS THROUGH
-		function hasErrors() {
-			global $action;
-			return $action->hasErrors();
-		}
+			// MESSAGE UTILS PASS THROUGH
+			function hasErrors() {
+				global $action;
+				return $action->hasErrors();
+			}
 
-		function hasErrorsForField($fieldName) {
-			global $action;
-			return $action->hasErrorsForField($fieldName);
-		}
+			function hasErrorsForField($fieldName) {
+				global $action;
+				return $action->hasErrorsForField($fieldName);
+			}
 
-		function hasErrorsOrWarningsForField($fieldName) {
-			global $action;
-			return $action->hasErrorsOrWarningsForField($fieldName);
-		}
+			function hasErrorsOrWarningsForField($fieldName) {
+				global $action;
+				return $action->hasErrorsOrWarningsForField($fieldName);
+			}
 
-		function getErrorsForField($fieldName) {
-			global $action;
-			return $action->getErrorsForField($fieldName);
-		}
+			function getErrorsForField($fieldName) {
+				global $action;
+				return $action->getErrorsForField($fieldName);
+			}
 
-		function getErrorsOrWarningsForField($fieldName) {
-			global $action;
-			return $action->getErrorsOrWarningsForField($fieldName);
-		}
+			function getErrorsOrWarningsForField($fieldName) {
+				global $action;
+				return $action->getErrorsOrWarningsForField($fieldName);
+			}
 
-		function getErrors() {
-			global $action;
-			return $action->getErrors();
-		}
+			function getErrors() {
+				global $action;
+				return $action->getErrors();
+			}
 
-		function hasWarnings() {
-			global $action;
-			return $action->hasWarnings();
-		}
+			function hasWarnings() {
+				global $action;
+				return $action->hasWarnings();
+			}
 
-		function hasWarningsForField($fieldName) {
-			global $action;
-			return $action->hasWarningsForField($fieldName);
-		}
+			function hasWarningsForField($fieldName) {
+				global $action;
+				return $action->hasWarningsForField($fieldName);
+			}
 
-		function getWarningsForField($fieldName) {
-			global $action;
-			return $action->getWarningsForField($fieldName);
-		}
+			function getWarningsForField($fieldName) {
+				global $action;
+				return $action->getWarningsForField($fieldName);
+			}
 
-		function getWarnings() {
-			global $action;
-			return $action->getWarnings();
-		}
+			function getWarnings() {
+				global $action;
+				return $action->getWarnings();
+			}
 
-		function hasNotices() {
-			global $action;
-			return $action->hasNotices();
-		}
+			function hasNotices() {
+				global $action;
+				return $action->hasNotices();
+			}
 
-		function hasNoticesForField($fieldName) {
-			global $action;
-			return $action->hasNoticesForField($fieldName);
-		}
+			function hasNoticesForField($fieldName) {
+				global $action;
+				return $action->hasNoticesForField($fieldName);
+			}
 
-		function getNoticesForField($fieldName) {
-			global $action;
-			return $action->getNoticesForField($fieldName);
-		}
+			function getNoticesForField($fieldName) {
+				global $action;
+				return $action->getNoticesForField($fieldName);
+			}
 
-		function getNotices() {
-			global $action;
-			return $action->getNotices();
-		}
+			function getNotices() {
+				global $action;
+				return $action->getNotices();
+			}
 
-		// TODO: expose template config info?
+			// VIEW SPECIFIC FUNCTIONALITY
+			function renderBody() {
+				global $action;
+				require_once ($action->getView());
+			}
 
-		function renderBody() {
-			global $action;
-			require_once ($action->getView());
+			function getTitle() {
+				global $action;
+				return $action->title;
+			}
+
+			function getPage() {
+				global $action;
+				return $action->page;
+			}
+
+			function getSubSection() {
+				global $action;
+				return $action->getSubSection();
+			}
+
+			function getSection() {
+				global $action;
+				return $action->getSection();
+			}
+
+			// ERROR SPECIFIC FUNCTIONALITY
+			function getException() {
+				global $action;
+				return $action->getException();
+			}
+
+			function getUserInput($key) {
+				global $action;
+				return $action->getUserInput($key);
+			}
 		}
 
 		// VIEW SPECIFIC FUNCTIONALITY - init view properties that may be in action
@@ -282,37 +321,6 @@ abstract class Action {
 		$this->section = $def->getSection();
 		$this->subSection = $def->getSubSection();
 		$this->page = $def->getPage();
-
-		function getTitle() {
-			global $action;
-			return $action->title;
-		}
-
-		function getPage() {
-			global $action;
-			return $action->page;
-		}
-
-		function getSubSection() {
-			global $action;
-			return $action->getSubSection();
-		}
-
-		function getSection() {
-			global $action;
-			return $action->getSection();
-		}
-
-		// ERROR SPECIFIC FUNCTIONALITY
-		function getException() {
-			global $action;
-			return $action->getException();
-		}
-
-		function getUserInput($key) {
-			global $action;
-			return $action->getUserInput($key);
-		}
 	}
 
 	/**
@@ -475,7 +483,7 @@ abstract class Action {
 			}
 		}
 		if (DEV_MODE) {
-			throw new Exception("Method ,\"set" . $capName . "()\", was not found in the action");
+			$this->addWarningSimple("Method ,\"set" . $capName . "()\", was not found in the action");
 		}
 	}
 
@@ -492,9 +500,6 @@ abstract class Action {
 	 * @todo Make sure that array values are scalars.
 	 */
 	private final function addMessage($messageKey, array $arguments = array (), $type, $fieldName = null) {
-		if (!isset ($_SESSION[$type])) {
-			$_SESSION[$type] = array ();
-		}
 		$message = $this->getProperties()->get($messageKey, $arguments);
 		$this->addMessageSimple($message, $type, $fieldName);
 	}
@@ -507,6 +512,9 @@ abstract class Action {
 	 * @param string $fieldName Optional input field associated with message.
 	 */
 	private final function addMessageSimple($message, $type, $fieldName = null) {
+		if (!isset($_SESSION[$type])) {
+			$_SESSION[$type] = array ();
+		}
 		$messageObj = new Message($message, $fieldName);
 		array_push($_SESSION[$type], $messageObj);
 	}

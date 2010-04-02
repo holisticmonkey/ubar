@@ -78,6 +78,17 @@ class Dispatcher {
 	private $actionDef;
 
 	/**
+	 * Result string returned from executed action. This is the result name
+	 * used to lookup a result definition in the Action or ActionMapper if not
+	 * found in the Action instance.
+	 *
+	 * @see $action
+	 * @see ActionMapper
+	 * @see $actionMapper
+	 */
+	private $resultString;
+
+	/**
 	 * Construct the dispatcher. This just sets up the dispatcher for
 	 * definition retrieval.
 	 *
@@ -102,14 +113,44 @@ class Dispatcher {
 	 * elsewhere.
 	 *
 	 * @param string $actionString Overriding action string. Use not
-	 * recommended.
+	 * recommended outside of testing.
 	 */
 	public function dispatch($actionString = null) {
-		// clear transient values in case part of an action forward
-		$this->action = null;
-		$this->view = null;
-		$this->actionDef = null;
 
+		// initiate action
+		$this->getAction($actionString);
+
+		// populate action from get and post
+		$this->populateUserInput();
+
+		// execute action, note that body may not execute if user conditions not met
+		$this->generateResult();
+
+		// get result for action and input
+		$this->getResultDef();
+
+		// show result
+		$this->showResult();
+	}
+
+	/**
+	 * Get action definition and instance using the requested URL or using an
+	 * overriding action name. The override is typically only used for testing
+	 * purposes and it is not recommended that it be used elsewhere.
+	 *
+	 * NOTE: This is a public method so that it may be called from tests. It is
+	 * not recommended that you call it directly elsewhere.
+	 *
+	 * @param string $actionString Overriding action string. Use not
+	 * recommended outside of testing.
+	 *
+	 * @returns class The action instance.
+	 *
+	 * @throws ActionNotFoundException If the action file was not found.
+	 * @throws Exception if the action def was not found and no default was
+	 * found.
+	 */
+	public function getAction($actionString = null) {
 		// no override to action name, get from url
 		if (is_null($actionString)) {
 			// match action part of the URI
@@ -156,37 +197,87 @@ class Dispatcher {
 		// instantiate specific action
 		$actionClassName = $this->actionDef->getClassName();
 		$this->action = new $actionClassName ($this->actionDef);
+		return $this->action;
+	}
 
-		// populate action from get and post
-		$this->populateUserInput();
+	/**
+	 * Execute the action and get the name of the result to lookup.
+	 *
+	 * NOTE: This is a public method so that it may be called from tests. It is
+	 * not recommended that you call it directly elsewhere.
+	 *
+	 * @return string The result string.
+	 */
+	public function generateResult() {
+		$this->resultString = $this->action->execute();
+		return $this->resultString;
+	}
 
-		// execute action, note that body may not execute if user conditions not met
-		$resultString = $this->action->execute();
-
-		$resultDef = $this->actionDef->getResult($resultString);
+	/**
+	 * Get the result definition using the result string. Normally the result
+	 * is found in the action or uses a generated "dummy" result (for page
+	 * views that do not require any processing). Global results are typically
+	 * used for error pages and similar.
+	 *
+	 * NOTE: This is a public method so that it may be called from tests. It is
+	 * not recommended that you call it directly elsewhere.
+	 *
+	 * @return class Result definition.
+	 *
+	 * @throws Exception when no result definition was found and it was unable
+	 * to default to showing an associated page.
+	 */
+	public function getResultDef() {
+		// try to find result def from action def
+		$resultDef = $this->actionDef->getResult($this->resultString);
 
 		// if null, look in global results
 		if ($resultDef == null) {
-			$resultDef = $this->actionMapper->getGlobalResult($resultString);
+			$resultDef = $this->actionMapper->getGlobalResult($this->resultString);
 		}
 
+		// if still null, see if it should use a dummy result
+		if ($resultDef == null && $this->resultString == GlobalConstants::SUCCESS) {
+			if (is_null($this->actionDef->getViewLocation())) {
+				throw new Exception("To use the default result for an action, you must have a view specified");
+			}
+			// create a dummy result that uses the defaults
+			$resultDef = Result :: makeResult(GlobalConstants :: SUCCESS, GlobalConstants :: PAGE_TYPE);
+		}
+
+		$this->resultDef = $resultDef;
+		return $this->resultDef;
+	}
+
+	/**
+	 * Render the result or redirect to the appropriate location.
+	 *
+	 * NOTE: This is a public method so that it may be called from tests. It is
+	 * not recommended that you call it directly elsewhere.
+	 *
+	 * NOTE: Currently a type of ERROR without a global result just dumps the
+	 * errors to screen.
+	 *
+	 * @throws Exception If now result defwas found and no default handling
+	 * could be found.
+	 *
+	 * @todo Do error presentation for ERROR type.
+	 *
+	 */
+	public function showResult() {
 		// no def and not default, look for it in global results
-		if ($resultDef == null) {
-			switch ($resultString) {
-				case GlobalConstants :: SUCCESS :
-					// only ok to have no result if has view in action def
-					if (is_null($this->actionDef->getViewLocation())) {
-						throw new Exception("To use the default result for an action, you must have a view specified");
-					}
-					// create a dummy result that uses the defaults
-					$resultDef = Result :: makeResult(GlobalConstants :: SUCCESS, GlobalConstants :: PAGE_TYPE);
-					break;
+		if ($this->resultDef == null) {
+			switch ($this->resultString) {
 				case GlobalConstants :: JSON :
 					// to render json, action must extend JSONAction
 					echo $this->action->getJSONString();
 					return;
 				case GlobalConstants :: ERROR :
-					die("render default error representation, overridable by having a global result for ERROR");
+					// TODO: build in a default error representation
+					// since no error result found, just dump the errors
+					echo("Unable to find default error representation, overridable by having a global result for ERROR<br />");
+					print_r($this->action->getErrors());
+					die();
 					break;
 				default :
 					throw new Exception("No definition found for result string $resultString for the action definition $actionClassName");
@@ -194,9 +285,8 @@ class Dispatcher {
 		}
 
 		// guaranteed to have a result def, switch on type
-		switch ($resultDef->getType()) {
+		switch ($this->resultDef->getType()) {
 			case GlobalConstants :: ACTION_TYPE :
-
 				// make a new request so there is no redeclaration or confusion with request params
 				// NOTE: this is less efficient but safer
 				// TODO: get possible override for action identifier instead of hardcoding ".action"
@@ -204,18 +294,18 @@ class Dispatcher {
 				break;
 			case GlobalConstants :: PAGE_TYPE :
 				// pass in possible overrides for page and template
-				$this->renderPage($resultDef);
+				$this->renderPage($this->resultDef);
 				break;
 			case GlobalConstants :: FILE_TYPE :
-				require_once (BASE_VIEW_PATH . $resultDef->getTarget());
+				require_once (BASE_VIEW_PATH . $this->resultDef->getTarget());
 				return;
 			case GlobalConstants :: URL_TYPE :
-				if (Str :: nullOrEmpty($resultDef->getTarget())) {
+				if (Str :: nullOrEmpty($this->resultDef->getTarget())) {
 					throw new Exception("With a url result type, you must specify a location to redirect to");
 				}
 
 				// url types (and possibly others?) may have expressions embedded in target, evaluate
-				$target = $this->evaluateResultString($resultDef->getTarget());
+				$target = $this->evaluateResultString($this->resultDef->getTarget());
 
 				header('Location: ' . $target);
 				return;
@@ -224,7 +314,7 @@ class Dispatcher {
 				echo $this->action->getJSONString();
 				return;
 			default :
-				throw new Exception("Unknown result type ," . $resultDef->getType());
+				throw new Exception("Unknown result type ," . $this->resultDef->getType());
 		}
 	}
 

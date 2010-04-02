@@ -293,15 +293,4 @@ $localeNameArray = LOCALE_DEFAULT;
 $currentLocale = setlocale(LC_ALL, explode(",", $localeNameArray));
 // set locale string to a constant to be used by property and resource retrieval
 define('LOCALE', $currentLocale);
-
-// set up localized properties? pick up from session since may be from user settings?
-
-// get action definitions
-// TODO: get dtd hosted somewhere and allow ubar.xml to be moved
-$dispatcher = new Dispatcher(UBAR_ROOT . "/ubar.xml");
-
-// not that framework is setup, let the controller dispatch the request
-$dispatcher->dispatch();
-
-
 ?>

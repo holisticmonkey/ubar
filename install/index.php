@@ -51,4 +51,11 @@ if (!file_exists($initScript)) {
 }
 // load init script
 require_once ($initScript);
+
+// get action definitions
+// TODO: get dtd hosted somewhere and allow ubar.xml to be moved
+$dispatcher = new Dispatcher(UBAR_ROOT . "/ubar.xml");
+
+// not that framework is setup, let the controller dispatch the request
+$dispatcher->dispatch();
 ?>

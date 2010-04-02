@@ -32,6 +32,14 @@
 		</exec>
 	</target>
 	
+	<target name="build-sample" description="Build sample implementation of framework">
+		<!-- install framework into ignored lib folder of sample application -->
+	</target>
+	
+	<target name="test-sample" description="Smoke test for sample working as expected">
+		<!-- For each action, test expected output including result, page info, etc -->
+	</target>
+	
 	<!-- NOTE: This requires that you have installed phpDocumentor using pear
 	and set an environment variabe PEAR_HOME to the location of your pear
 	directory -->
@@ -82,12 +90,15 @@
 		<copy file="${actiondefs.name}.in" tofile="${lib.build.dir}/${actiondefs.name}"/>
 	</target>
 	
-	<target name="package" description="Package project for distribution" depends="test,generate-docs,build-source">
+	<target name="package" description="Package project for distribution" depends="test,generate-docs,build-source,build-sample">
 		<!-- delete last package -->
 		<delete failonerror="false" file="${dist.dir}/${package.name}" />
 		
 		<!-- copy README to root instead of being in lib -->
 		<copy file="${basedir}/README" tofile="${build.dir}/README"/>
+		
+		<!-- copy sample application to root instead of being in lib -->
+		
 		
 		<!-- zip contents of build dir -->
 		<zip
