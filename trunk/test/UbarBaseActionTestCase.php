@@ -6,27 +6,69 @@
 require_once("UbarBaseTestCase.php");
 abstract class UbarBaseActionTestCase extends UbarBaseTestCase {
 
-	private $actionMapper;
+	protected $dispatcher;
+
+	protected $actionDef;
+
+	protected $action;
+
+	protected $resultString;
+
+	protected $resultDef;
 
 	public function __construct() {
+		// construct UbarBaseTestCase first since it does most of the setup
+		parent::__construct();
+
+		// do the setup required for action context material
 		require_once (UBAR_ROOT . "/init.php");
+
 		// override possible 'On' state for html errors since will be in console
 		ini_set('html_errors', 'Off');
-		$this->actionMapper = new ActionMapper(UBAR_ROOT . "/ubar.xml");
-		parent::__construct();
+
+		// create an instance of the dispatcher
+		$this->dispatcher = new Dispatcher(UBAR_ROOT . "/ubar.xml");
 	}
 
-	// TODO: figure out how to consolidate some of this functionality with stuff going on in the dispatcher
-	protected function createAction($actionString) {
-		// get view path from config
-		$actionDef = $this->actionMapper->getAction($actionString);
-		$viewRealPath = BASE_VIEW_PATH . $actionDef->getViewLocation();
-		$actionClassName = $actionDef->getClassName();
-		$action = new $actionClassName($viewRealPath);
-		// TODO: how do we want to surface action definiion so you can test the result wiring?
-		// do we even need to test that since it's part of the config stuff... maybe because of chain testing
-		//$resultDef = $actionDef->getResult($resultString);
-		return $action;
+	// users may want to set more $_SERVER properties, see
+	// http://php.net/manual/en/reserved.variables.server.php
+	protected function initAction($actionString) {
+		// set up commonly referenced properties by views and templates
+		$_SESSION = array();
+		// TODO: see http://php.net/manual/en/reserved.variables.server.php for
+		// more properties to set
+		$_SERVER['REQUEST_URI'] = "http://localhost/" . $actionString . ".php";
+
+		// initiate action
+		$this->action = $this->dispatcher->getAction($actionString);
 	}
+
+	// note that need to use setUserInput first
+	protected function runAction() {
+		// execute action, note that body may not execute if user conditions not met
+		$this->resultString = $this->dispatcher->generateResult();
+
+		// get result for action and input
+		$this->resultDef = $this->dispatcher->getResultDef();
+	}
+
+	// note that don't always need this, mostly for confirmation that rendering process didn't produce exceptions
+	protected function assertRenderValid() {
+		$this->dispatcher->showResult();
+	}
+
+	protected function setUserInput($key, $val) {
+		$this->action->set($key, $val);
+	}
+
+	protected function tearDown() {
+		unset($this->actionDef);
+		unset($this->action);
+		unset($this->resultString);
+		unset($this->resultDef);
+	}
+
+	// TODO: add helper methods for asserting has error, warning, info
+	// '' title, path, etc
 }
 ?>
