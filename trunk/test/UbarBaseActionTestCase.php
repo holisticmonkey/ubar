@@ -41,6 +41,7 @@ abstract class UbarBaseActionTestCase extends UbarBaseTestCase {
 
 		// initiate action
 		$this->action = $this->dispatcher->getAction($actionString);
+		$this->actionDef = $this->action->getActionDef();
 	}
 
 	// note that need to use setUserInput first

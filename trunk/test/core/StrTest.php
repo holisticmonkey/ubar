@@ -1,5 +1,5 @@
 <?php
-require_once("UbarBaseTestCase.php");
+require_once(__DIR__ . "/../UbarBaseTestCase.php");
 class StrTest extends UbarBaseTestCase {
 
 	private $notInitialized;

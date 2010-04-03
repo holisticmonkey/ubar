@@ -1,5 +1,5 @@
 <?php
-require_once("UbarBaseTestCase.php");
+require_once(__DIR__ . "/../UbarBaseTestCase.php");
 class PropertiesTest extends UbarBaseTestCase {
 
 	function test_construct() {
@@ -9,7 +9,7 @@ class PropertiesTest extends UbarBaseTestCase {
 
 		$pathToPropertiesClass = UBAR_ROOT . "core" . DIRECTORY_SEPARATOR . "Properties.php";
 
-		$expectedMessage = "Path \"$bad\" to properties file does not exist. File: " . $pathToPropertiesClass . " on line: 22";
+		$expectedMessage = "Path \"$bad\" to properties file does not exist. File: " . $pathToPropertiesClass . " on line: 66";
 
 		// test that it fails if you give a bad file
 		try {
