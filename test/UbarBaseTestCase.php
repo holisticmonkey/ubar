@@ -1,4 +1,4 @@
-<?
+<?php
 /**
  * These tests are written for PHPUnit version 3.4 under the assumption they will be run
  * using an external configuration with eclipse and/or the Ant build script associated

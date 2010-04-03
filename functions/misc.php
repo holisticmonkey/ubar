@@ -58,7 +58,7 @@ function getClassPaths($directory, $recursive = FALSE) {
 			if (is_dir($file) && $recursive) {
 				getClassPaths($file, $recursive);
 			} elseif (is_file($file) && (substr($file, strlen($file) - 4, 4) == '.php')) {
-				$classes[$entry] = $directory . '\\' . $entry;
+				$classes[$entry] = $directory . '/' . $entry;
 			}
 		}
 	}

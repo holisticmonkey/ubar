@@ -35,10 +35,9 @@ require_once (UBAR_ROOT . "/functions/misc.php");
 /**
  * Add the constants, exception, and core folders recursively
  */
-getClassPaths(UBAR_ROOT . "/constants", TRUE);
-getClassPaths(UBAR_ROOT . "/exception", TRUE);
-getClassPaths(UBAR_ROOT . "/core", TRUE);
-
+getClassPaths(UBAR_ROOT . "constants", TRUE);
+getClassPaths(UBAR_ROOT . "exception", TRUE);
+getClassPaths(UBAR_ROOT . "core", TRUE);
 
 /**
  * Get an instance of the config properties.

@@ -1,4 +1,4 @@
-<?
+<?php
 /**
  * Ubar Framework Setup Script
  *

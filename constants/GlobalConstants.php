@@ -1,4 +1,4 @@
-<?
+<?php
 /**
  * Class definition for GlobalConstants
  * @package		core

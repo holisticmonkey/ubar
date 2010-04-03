@@ -14,13 +14,5 @@ class UbarTestSuite extends PHPUnit_Framework_TestSuite {
 		}
 		parent :: __construct();
 	}
-
-	public static function suite() {
-		$suite = new UbarTestSuite('masterSuite');
-		//$suite->addTest(new StrTest('nameasdf'));
-		$suite->addTestSuite('StrTest');
-		$suite->addTestSuite('PropertiesTest');
-		return $suite;
-	}
 }
 ?>

@@ -916,6 +916,17 @@ abstract class Action {
 		return $this->subSection;
 	}
 
+	/**
+	 * Get the action definition associated with this action.
+	 *
+	 * NOTE: this is currently only used for testing.
+	 *
+	 * @return class Action definition.
+	 */
+	public final function getActionDef() {
+		return $this->actionDef;
+	}
+
 	// COMMON BUTTON NAMES
 
 	/**

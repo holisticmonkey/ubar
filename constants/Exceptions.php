@@ -1,4 +1,4 @@
-<?
+<?php
 /**
  * Class definition for Exceptions
  * @package		core
