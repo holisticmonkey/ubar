@@ -30,6 +30,18 @@ class ActionMapper {
 	private $defaultActionName;
 
 	/**
+	 * @var string The action to use when no action class is specified in your
+	 * action definition. This class is where you would locate functionality
+	 * you want in all templates and views. It should always return success.
+	 *
+	 * This replaces DummyAction if defined.
+	 *
+	 * @see DummyAction
+	 * @see GlobalConstants::SUCCESS
+	 */
+	private $dummyActionPath;
+
+	/**
 	 * @var array A collection of action XML objects.
 	 */
 	private $actions;
@@ -67,6 +79,9 @@ class ActionMapper {
 
 		// get the name of the default action
 		$this->defaultActionName = (string) $actionDefsXML->defaultAction['name'];
+
+		// get the name of the default action
+		$this->dummyActionPath = FileUtils::dotToPath((string) $actionDefsXML->dummyAction['path']);
 
 		// assign actions as a local variable
 		$this->actions = $actionDefsXML->actions->action;
@@ -146,6 +161,15 @@ class ActionMapper {
 	 */
 	public function getDefaultAction() {
 		return $this->getAction($this->defaultActionName);
+	}
+
+	/**
+	 * Gets the path to the action that overrides DummyAction
+	 *
+	 * @return string Path to overriding dummy action
+	 */
+	public function getDummyActionPath() {
+		return $this->dummyActionPath;
 	}
 
 	/**

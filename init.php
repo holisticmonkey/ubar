@@ -40,18 +40,34 @@ getClassPaths(UBAR_ROOT . "exception", TRUE);
 getClassPaths(UBAR_ROOT . "core", TRUE);
 
 /**
- * Get an instance of the config properties.
+ * Allow recognition of all line ending types, required to recognize mac
+ * property files
  */
-$props = new Properties(UBAR_ROOT . "ubar_config.properties", true);
+ini_set("auto_detect_line_endings", true);
+
+/**
+ * Get an instance of the config properties. Allow path to be overridden for
+ * testing purposes.
+ */
+if(defined('UBAR_CONFIG_OVERRIDE')) {
+	$props = new Properties(UBAR_CONFIG_OVERRIDE, true);
+} else {
+	$props = new Properties(UBAR_ROOT . "ubar_config.properties", true);
+}
 
 # DEFINE CONSTANTS FROM PROPERTIES FILE
 /**
  * Define DEV_MODE, defaulting to the value found in DEV_MODE if not set.
  * NOTE: This must be defined prior to other defines due to their values
  * switching on DEV_MODE
+ *
+ * NOTE: Some test classes may define this before init script loaded.
+ *
  * @see GlobalConstants::DEV_MODE
  */
-define('DEV_MODE', $props->getBool('DEV_MODE', GlobalConstants :: DEV_MODE));
+if(!defined('DEV_MODE')) {
+	define('DEV_MODE', $props->getBool('DEV_MODE', GlobalConstants :: DEV_MODE));
+}
 
 /**
  * Define a property appender based on dev mode to simplify the dev mode value

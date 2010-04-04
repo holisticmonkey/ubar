@@ -28,7 +28,11 @@
 		<mkdir dir="${logs.dir}" />
 		
 		<exec dir="${test.dir}" executable="phpunit.bat" failonerror="true">
-			<arg line="--log-junit ${logs.dir}/UbarTestSuite.xml  --verbose UbarTestSuite" />
+			<arg line="--log-junit ${logs.dir}/UbarAllTests.xml  --verbose UbarAllTests" />
+		</exec>
+		
+		<exec dir="${test.dir}" executable="phpunit.bat" failonerror="true">
+			<arg line="--coverage-html ${logs.dir}/coverage UbarAllTests" />
 		</exec>
 	</target>
 	
@@ -59,8 +63,10 @@
 			<arg value="HTML:frames:default" />
 			<arg value="--directory" />
 			<arg value="${basedir}" />
-			<arg value="--ignore" />
+			<!--
+			<arg value="-ignore" />
 			<arg value="${basedir}/test*" />
+			-->
 			<arg value="--title" />
 			<arg value="Ubar PHP MVC Framework Documentation" />
 			<arg value="--parseprivate" />
@@ -84,6 +90,11 @@
 				<exclude name="README"/>
 			</fileset>
 		</copy>
+		
+		<!-- copy test files developers will want to use to test their app -->
+		<copy file="${test.dir}/UbarBaseActionTestCase.php" tofile="${lib.build.dir}/test/UbarBaseActionTestCase.php"/>
+		<copy file="${test.dir}/UbarBaseTestCase.php" tofile="${lib.build.dir}/test/UbarBaseTestCase.php"/>
+		<copy file="${test.dir}/UbarTestSuite.php" tofile="${lib.build.dir}/test/UbarTestSuite.php"/>
 
 		<!-- copy .in files to build directory for inclusion in archive -->
 		<copy file="${config.name}.in" tofile="${lib.build.dir}/${config.name}"/>

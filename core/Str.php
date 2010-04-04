@@ -81,7 +81,10 @@ class Str {
 	 * @todo Allow flag for adaptive decimals (ie 10 and 10.332 could both be with 4 decimals if they don't have more decimals..)
 	 *
 	 */
-	public static function formatNumber($number, $maxDecimals = 4, $localeOverride = null) {
+	public static function formatNumber($number, $maxDecimals = null, $localeOverride = null) {
+		if(is_null($maxDecimals)) {
+			$maxDecimals = 4;
+		}
 		$locale = localeconv();
 		/*
 		if(isset($localeOverride)) {
@@ -101,7 +104,7 @@ class Str {
 		$decimals = 0;
 		$pos = strripos($number, $locale['decimal_point']);
 		if ($pos !== false) {
-			$decimals = min(strlen($number) - $pos, $maxDecimals);
+			$decimals = min(strlen($number) - $pos - 1, $maxDecimals);
 		}
 		return number_format($number, $decimals, $locale['decimal_point'], $locale['thousands_sep']);
 	}

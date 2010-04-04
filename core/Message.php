@@ -60,16 +60,57 @@ class Message {
 	}
 
 	/**
-		 * Get the message contents. This is typically in the form of errors,
-		 * warnings, and notices. Most messages are the result of retrieving a
-		 * raw message from a properties file, substituting in arguments and
-		 * evaluating expressions and using the resulting string in this class
-		 * custructor.
-		 *
-		 * @return string The message string.
-		 */
+	 * Get the message contents. This is typically in the form of errors,
+	 * warnings, and notices. Most messages are the result of retrieving a
+	 * raw message from a properties file, substituting in arguments and
+	 * evaluating expressions and using the resulting string in this class
+	 * custructor.
+	 *
+	 * @return string The message string.
+	 */
 	public function getMessage() {
 		return $this->message;
+	}
+
+	/**
+	 * Compare a given object to this object instance. Only return true if the
+	 * classes are of the same type and all properties are equal.
+	 *
+	 * This will typically be used for testing purposes.
+	 *
+	 * @param class $other The object you want to compare to this instance.
+	 *
+	 * @return boolean True if the classes are of the same type and all
+	 * properties are equal.
+	 */
+	public function equals($other) {
+		if(!is_object($other) || get_class($this) != get_class($other)) {
+			return false;
+		}
+
+		if($this->fieldName != $other->getFieldName()) {
+			return false;
+		}
+
+		if($this->message != $other->getMessage()) {
+			return false;
+		}
+
+		return true;
+	}
+
+	/**
+	 * Basic toString method that returns a representation of this object.
+	 *
+	 * @returns string A representation of this object.
+	 */
+	public function __toString() {
+		$out = "";
+		if($this->fieldName != null) {
+			$out .= '(' . $this->fieldName . ') ';
+		}
+		$out .= $this->message;
+		return $out;
 	}
 }
 ?>

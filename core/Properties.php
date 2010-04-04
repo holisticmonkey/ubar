@@ -42,6 +42,9 @@ class Properties {
 	/**
 	 * Regular expression to strip comments out of lines before processing.
 	 *
+	 * NOTE: (*ANYCRLF) is not required since this is used on a single line,
+	 * not across lines.
+	 *
 	 * EXAMPLE:
 	 * # comment one
 	 * !comment two
@@ -49,7 +52,7 @@ class Properties {
 	 *
 	 * OPTIONS: extra analysis, utf-8
 	 */
-	const PROP_COMMENT_REGEX = '/^\s*(#|!).*$/Smu';
+	const PROP_COMMENT_REGEX = '/^\s*(#|!).*$/Su';
 
 	/**
 	 * Construct an interface to a given properties file.

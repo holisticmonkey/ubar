@@ -57,20 +57,28 @@ class LocalizedProperties {
 
 	/**
 	 * A prepend string for the dynamic property regular expression.
+	 *
+	 * NOTE: Added (*ANYCRLF) so that CR/LF/CRLF/EOF all match the $ in
+	 * PROP_VALUE_REGEX_APPEND below. Otherwise it would only match LF/EOF.
 	 */
-	const PROP_VALUE_REGEX_PREPEND = '/^\s*';
+	const PROP_VALUE_REGEX_PREPEND = '/(*ANYCRLF)^\s*';
 
 	/**
 	 * Appender for regular expression to extract the value from a property line.
+	 * The whole regex should match start of line, any amount of whitespace
+	 * before and after the search key, zero or one spaces after the "=" sign,
+	 * any chars followed by an optional CR and either a newline or end of
+	 * file. Note that the CR is present, optionally, due to $ matching only
+	 * a line feed or end of file, CR would be captured otherwise.
 	 *
-	 * Modifiers: multiline, extra analysis, utf-8
+	 * Modifiers: multiline, extra analysis, utf-8, complain if bad escape
 	 *
 	 * Example: key = message
 	 *
 	 * NOTE: only zero or one white spaces after the "=" are stripped from the
 	 * match so that you can get spaces before your string...
 	 */
-	const PROP_VALUE_REGEX_APPEND = '\s*=\s{0,1}(.*)$/mSu';
+	const PROP_VALUE_REGEX_APPEND = '\s*=\s{0,1}(.*)$/mSuX';
 
 	/**
 	 * @var boolean $isDefault Flag indicating that the properties file used
@@ -95,7 +103,7 @@ class LocalizedProperties {
 
 		// verify directory found
 		if (!file_exists($path)) {
-			throw new Exception("Path \" $path \" to properties files does not exist. File: " . __FILE__ . " on line: " . __LINE__);
+			throw new Exception("Path \"$path\" to properties files does not exist. File: " . __FILE__ . " on line: " . __LINE__);
 		}
 
 		// get locale
@@ -105,11 +113,13 @@ class LocalizedProperties {
 			//$this->locale = Locale::parseLocale($locale);
 			$this->locale = $locale;
 			//die(print_r($this->locale));
-		} else
-			if (defined(LOCALE)) {
+		} else {
+			if (defined('LOCALE')) {
 				// TODO: convert to Locale instance
 				$this->locale = LOCALE;
 			}
+		}
+
 		// TODO: check if valid locale
 
 		// make sure that default properties file exists
@@ -145,13 +155,17 @@ class LocalizedProperties {
 	 * formatting to substitute arguments or parse simple expressions.
 	 *
 	 * @param string $key Key to use for message lookup.
-	 * @param array $arguments Arguments to use for expression evaluation and
+	 * @param mixed $arguments Arguments to use for expression evaluation and
 	 * substitution.
 	 * @param boolean $strict Whether to throw an error when key not found.
 	 *
 	 * @return string Processed message.
 	 */
-	public function get($key, array $arguments = array (), $strict = FALSE) {
+	public function get($key, $arguments = array (), $strict = FALSE) {
+		// convenience, if one arg passed in, need not be array
+		if(is_scalar($arguments)) {
+			$arguments = array($arguments);
+		}
 		$entry = $this->getSimple($key, $strict);
 		if (count($arguments) > 0) {
 			return MessageFormat :: get($entry, $arguments, $this->locale);
@@ -183,15 +197,12 @@ class LocalizedProperties {
 			// not found, if not default, try to find in default resource
 		} else
 			if (!$this->isDefault) {
-				// TODO: if devmode, log that main not found and looking for default
-				// find default
 				preg_match($regex, $this->defaultProperties, $matches);
 				// if found, return it
 				if (isset ($matches[1])) {
 					return $matches[1];
 				}
 			}
-		// TODO: if devmode, log that no entry found for given key
 		if ($strict) {
 			throw new Exception("The key \"" . $key . "\" was not found.");
 		} else {

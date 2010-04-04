@@ -527,7 +527,7 @@ abstract class Action {
 	 * @return boolean Indication as to whether messages of that type were
 	 * present.
 	 */
-	private final function hasMessages($type) {
+	public final function hasMessages($type) {
 		return isset ($_SESSION[$type]) && count($_SESSION[$type]) > 0;
 	}
 
@@ -583,7 +583,7 @@ abstract class Action {
 	 * @return array A collection of messages for the given type or an empty
 	 * array if no messages were found.
 	 */
-	private final function getMessages($type) {
+	public final function getMessages($type) {
 		return isset ($_SESSION[$type]) ? $_SESSION[$type] : array ();
 	}
 

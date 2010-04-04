@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE actionMappings SYSTEM "../../ubar.dtd">
+
+<actionMappings>
+
+	<defaultAction name="Home" />
+	
+	<dummyAction path="AlwaysSuccess" />
+	
+	<globalResults>
+		<result name="ERROR" type="page" template="default">pages.error</result>
+	</globalResults>
+	
+	<templates>
+		<template name="default" path="templates.default">
+			<param name="displaySidebar" value="true" />
+		</template>
+		<template name="portfolio" extends="default">
+			<param name="section" value="portfolio" />
+		</template>
+		<template name="programming" extends="portfolio">
+			<param name="subSection" value="programming" />
+		</template>
+	</templates>
+
+	<actions>
+		<action name="Home" view="pages.home" template="default" />
+		<action name="Contact" view="pages.contact" template="default" titleKey="contact.title" />
+		<action name="Resume" view="pages.resume" template="default" title="Resume" />
+		<action name="Privacy" view="pages.privacy" template="simple" />
+		<action name="Programming" view="pages.framework" template="default" section="framework" titleKey="framework.title" />
+		
+		<!-- Admin -->
+		<action name="Login" path="Login" view="pages.login" template="default" />
+		<action name="ValidateCredentials" path="ValidateCredentials">
+			<results>
+				<result type="url">${referringPage}</result>
+				<result name="USER_ERROR" type="url">Login.action?referringPage=${referringPage}</result>
+			</results>
+		</action>
+		<action name="LogOut" path="LogOut">
+			<results>
+				<result type="url">${referringPage}</result>
+			</results>
+		</action>
+		<action name="EditAccount" path="EditAccount" view="pages.editAccount" template="default" />
+		<action name="UpdateAccount" path="UpdateAccount">
+			<results>
+				<result type="action">EditAccount</result>
+				<result name="USER_ERROR" type="action">EditAccount</result>
+			</results>
+		</action>
+		
+		<!-- Blog -->
+		<action name="Blog" path="blog.Blog" view="pages.blog" template="default" section="blog" />
+		<action name="PostBlog" path="blog.PostBlog">
+			<results>
+				<result type="action">Blog</result>
+				<result name="USER_ERROR" type="action">Blog</result>
+			</results>
+		</action>
+		<action name="PostBlogComment" path="blog.PostBlogComment">
+			<results>
+				<result type="url">Blog.action?blogId=${blogId}</result>
+				<result name="USER_ERROR" type="url">Blog.action?blogId=${blogId}#comments</result>
+			</results>
+		</action>
+		<action name="DeleteBlogComment" path="blog.DeleteBlogComment">
+			<results>
+				<result type="url">Blog.action?blogId=${blogId}</result>
+				<result name="USER_ERROR" type="url">Blog.action?blogId=${blogId}</result>
+			</results>
+		</action>
+		<action name="DeleteBlogPost" path="blog.DeleteBlogPost">
+			<results>
+				<result type="action">Blog</result>
+				<result name="USER_ERROR" type="url">Blog.action?blogId=${blogId}</result>
+			</results>
+		</action>
+		<action name="PostBlogUpdate" path="blog.PostBlogUpdate">
+			<results>
+				<result type="url">Blog.action?blogId=${blogId}</result>
+				<result name="USER_ERROR" type="url">Blog.action?blogId=${blogId}</result>
+			</results>
+		</action>
+		<action name="PostBlogCommentUpdate" path="blog.PostBlogCommentUpdate">
+			<results>
+				<result type="url">Blog.action?blogId=${blogId}</result>
+				<result name="USER_ERROR" type="url">Blog.action?blogId=${blogId}</result>
+			</results>
+		</action>
+	</actions>
+</actionMappings>
