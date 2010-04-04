@@ -169,6 +169,13 @@ class ActionDef {
 	}
 
 	/**
+	 * Override the action class location. Used when a dummy action is inferred.
+	 */
+	public function setActionLocation($location) {
+		$this->actionLocation = $location;
+	}
+
+	/**
 	 * Get the location of the view php file associated with this action
 	 * definition, if any.
 	 *
@@ -185,6 +192,13 @@ class ActionDef {
 	 */
 	public function getClassName() {
 		return $this->actionClassName;
+	}
+
+	/**
+	 * Override the action class name. Used when a dummy action is inferred.
+	 */
+	public function setClassName($name) {
+		$this->actionClassName = $name;
 	}
 
 	/**

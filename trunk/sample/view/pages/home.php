@@ -1,0 +1,1 @@
+<p>Welcome the the Ubar sample application. This is the home page.</p>

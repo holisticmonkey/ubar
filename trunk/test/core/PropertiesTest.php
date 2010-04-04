@@ -2,21 +2,21 @@
 require_once(__DIR__ . "/../UbarBaseTestCase.php");
 class PropertiesTest extends UbarBaseTestCase {
 
-	function test_construct() {
+	function testConstruct() {
 		// need to use DIRECTORY_SEPARATOR since real path is part of messaging
 		$bad = UBAR_ROOT . "test" . DIRECTORY_SEPARATOR . "data" . DIRECTORY_SEPARATOR . "sample_missing.properties";
 		$good = UBAR_ROOT . "test/data/sample.properties";
 
 		$pathToPropertiesClass = UBAR_ROOT . "core" . DIRECTORY_SEPARATOR . "Properties.php";
 
-		$expectedMessage = "Path \"$bad\" to properties file does not exist. File: " . $pathToPropertiesClass . " on line: 66";
+		$expectedMessage = "Path \"$bad\" to properties file does not exist. File: " . $pathToPropertiesClass . " on line: ";
 
 		// test that it fails if you give a bad file
 		try {
 			new Properties($bad);
 			$this->fail("Expected exception trying to get nonexistant file.");
 		} catch (Exception $e) {
-			$this->assertEquals($expectedMessage, $e->getMessage());
+			$this->assertStringStartsWith($expectedMessage, $e->getMessage());
 		}
 
 		// test that it fails silently and returns default if fail silent on and default provided
@@ -28,7 +28,7 @@ class PropertiesTest extends UbarBaseTestCase {
 		$goodProps->get("sample.simple");
 	}
 
-	function test_get() {
+	function testGet() {
 		$path = UBAR_ROOT . "test" . DIRECTORY_SEPARATOR . "data" . DIRECTORY_SEPARATOR . "sample.properties";
 		$pathToPropertiesClass = UBAR_ROOT . "core" . DIRECTORY_SEPARATOR . "Properties.php";
 		$props = new Properties($path);
@@ -67,7 +67,7 @@ class PropertiesTest extends UbarBaseTestCase {
 
 	}
 
-	function test_getBool() {
+	function testGetBool() {
 		$path = UBAR_ROOT . "test" . DIRECTORY_SEPARATOR . "data" . DIRECTORY_SEPARATOR . "sample.properties";
 		$pathToPropertiesClass = UBAR_ROOT . "core" . DIRECTORY_SEPARATOR . "Properties.php";
 		$props = new Properties($path);
@@ -83,6 +83,17 @@ class PropertiesTest extends UbarBaseTestCase {
 			$value = $props->get("sample.badboolean");
 			$expectedMessage = "The property found, " . $value . ", with the key \"sample.badboolean\" could not be converted to a boolean value in the file \"$path\".";
 			$this->assertEquals($expectedMessage, $e->getMessage());
+		}
+	}
+
+	function testDuplicate() {
+		$path = UBAR_ROOT . "test" . DIRECTORY_SEPARATOR . "data" . DIRECTORY_SEPARATOR . "sample.duplicate.properties";
+		$pathToPropertiesClass = UBAR_ROOT . "core" . DIRECTORY_SEPARATOR . "Properties.php";
+		try {
+			$props = new Properties($path);
+			$this->fail("An exception for duplicate key should have been thrown.");
+		} catch (Exception $e) {
+			// noop
 		}
 	}
 }

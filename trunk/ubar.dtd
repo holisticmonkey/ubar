@@ -7,11 +7,16 @@
    <!DOCTYPE actionMappings SYSTEM "ubar.dtd">
 -->
 
-<!ELEMENT actionMappings (defaultAction?, globalResults?, templates?, permissionGroups?, actions?)>
+<!ELEMENT actionMappings (defaultAction?, dummyAction?, globalResults?, templates?, permissionGroups?, actions?)>
 
 <!ELEMENT defaultAction EMPTY>
 <!ATTLIST defaultAction
     name CDATA #REQUIRED
+>
+
+<!ELEMENT dummyAction EMPTY>
+<!ATTLIST dummyAction
+    path CDATA #REQUIRED
 >
 
 <!ELEMENT globalResults (result+)>

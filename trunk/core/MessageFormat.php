@@ -28,7 +28,7 @@
  * @package		core
  * @subpackage	utils
  *
- * @todo Complete data formatting.
+ * @todo Complete data formatting such as duration and verbose
  * @todo Complete math evaluation.
  * @todo Determine what to dowith choice conditions that are not satisfied.
  * @todo Cache results if same thing is called a number of times... though
@@ -145,6 +145,9 @@ class MessageFormat {
 		} catch (Exception $e) {
 			// TODO: determine what expected errors can be caught and handle appropriately
 			// something unknown went wrong, make xthml safe since the expression language format will cause xml parse errors
+			if(DEV_MODE) {
+				throw $e;
+			}
 			$string = htmlspecialchars($string);
 		}
 		return $string;
@@ -162,7 +165,7 @@ class MessageFormat {
 	 * @param string $string Message to be formatted.
 	 */
 	private static function ignore($invalidExpression, &$ignoreList, &$string) {
-		$replaceMarker = MSG_IGNORE_START . count($ignoreList) .  MSG_IGNORE_END;
+		$replaceMarker = self::MSG_IGNORE_START . count($ignoreList) . self::MSG_IGNORE_END;
 		$string = str_replace($invalidExpression, $replaceMarker, $string);
 		$ignoreList[$replaceMarker] = $invalidExpression;
 	}
@@ -201,7 +204,10 @@ class MessageFormat {
 		case "number":
 			// TODO: do a switch on modifier for float, decimal, money, etc
 				// use money_format() for formatting money in the Str class
-			$returnString = Str::formatNumber($value, $locale);
+			if($modifiers == "integer") {
+				$value = floor($value);
+			}
+			$returnString = Str::formatNumber($value, null, $locale);
 			break;
 
 		case "choice":
@@ -226,7 +232,6 @@ class MessageFormat {
 						$returnString = $result;
 					}
 					// equality is the trump card and wins over > <
-					continue;
 					break;
 
 				// value is less than compareValue
@@ -253,9 +258,9 @@ class MessageFormat {
 
 				// not yet suppoprted comparator
 				default:
-					// TODO: only die in dev mode
-					throw new Exception("unsupported comparator \"" . $comparator . "\".");
-					continue;
+					if(DEV_MODE) {
+						throw new Exception("unsupported comparator \"" . $comparator . "\".");
+					}
 					break;
 				}
 			}
@@ -264,21 +269,33 @@ class MessageFormat {
 		// do date formatting. note that this should be locale specific
 		case "date":
 			// if not timestamp, try to make one
+			$date = $value;
 			if(!is_int($value)) {
-				$value = strtotime($value);
+				$date = strtotime($value);
+				if($date == FALSE && DEV_MODE) {
+					throw new Exception("Unable to convert $value into a date");
+				}
 			}
-			// TODO: handle modifiers of "duration", "relative" (to now), "format" (with a provided format string), "verbose", "short", etc
+			// TODO: handle modifiers of "duration", "relative" (to now),"short", etc
 			switch($modifiers) {
-			case "duration":
-				// convert to duration like "5 weeks, 3 days ago" or "68 seconds from now"
-			case "verbose":
-				//
-			case "normal":
-				// just fall through to default
-			default:
-				// do standard date format for current timezone
-				$returnString = strftime('%c', $value);
-				break;
+				case "datetime":
+					$returnString = strftime('%c', $date);
+					break;
+				case "duration":
+					// convert to duration like "5 weeks, 3 days ago" or "68 seconds from now"
+					//TODO: implement duration formatting
+					$returnString = $date;
+					break;
+				case "verbose":
+					$returnString = strftime('%B %d, %Y', $date);
+					break;
+				case "normal":
+					// just fall through to default
+				default:
+					// do standard date format for current timezone
+					// TODO: use %c if they put a time
+					$returnString = strftime('%x', $date);
+					break;
 			}
 			break;
 
@@ -312,7 +329,6 @@ class MessageFormat {
 		default:
 			// TODO: only die in dev mode
 			throw new Exception("unsupported directive type \"" . $type . "\".");
-			continue;
 			break;
 		}
 		return $returnString;

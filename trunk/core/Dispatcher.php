@@ -184,7 +184,18 @@ class Dispatcher {
 		$actionRealPath = null;
 		// if no action name was provided, use a dummy to always return success
 		if ($this->actionDef->getActionLocation() == '') {
-			$actionRealPath = UBAR_ROOT . '/core/' . GlobalConstants :: DUMMY_ACTION . '.php';
+			// see if overriding dummy provided, used to expose common methods
+			// to tempates and similar
+			$dummyOverride = $this->actionMapper->getDummyActionPath();
+			if(is_null($dummyOverride)) {
+				$actionRealPath = UBAR_ROOT . '/core/' . GlobalConstants :: DUMMY_ACTION . '.php';
+			} else {
+				// mostly set for debugging purposes
+				$this->actionDef->setActionLocation($dummyOverride);
+				$actionRealPath = BASE_ACTION_PATH . $dummyOverride;
+				$actionClassName = FileUtils::classFromFile($dummyOverride);
+				$this->actionDef->setClassName($actionClassName);
+			}
 		} else {
 			$actionRealPath = BASE_ACTION_PATH . $this->actionDef->getActionLocation();
 		}
@@ -194,7 +205,7 @@ class Dispatcher {
 			require_once ($actionRealPath);
 		}
 
-		// instantiate specific action
+		// instantiate specific action - class name may have been overridden
 		$actionClassName = $this->actionDef->getClassName();
 		$this->action = new $actionClassName ($this->actionDef);
 		return $this->action;
