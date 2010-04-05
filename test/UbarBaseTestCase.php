@@ -13,17 +13,18 @@ ini_set("auto_detect_line_endings", true);
 class UbarBaseTestCase extends PHPUnit_Framework_TestCase {
 
 	public function __construct($name = NULL, array $data = array(), $dataName = '') {
-		if (!defined('DEV_MODE')) {
-			define('DEV_MODE', true);
-		}
+		global $UBAR_GLOB;
+
+		$UBAR_GLOB['DEV_MODE'] = true;
+
 		require_once (dirname(__FILE__) . "/../functions/misc.php");
 
 		// allow the following folders of classes to be auto-loaded
-		if (!defined('UBAR_ROOT')) {
-			define('UBAR_ROOT', realpath(dirname(__FILE__) . "/../") . DIRECTORY_SEPARATOR);
-			getClassPaths(UBAR_ROOT . "constants", TRUE);
-			getClassPaths(UBAR_ROOT . "exception", TRUE);
-			getClassPaths(UBAR_ROOT . "core", TRUE);
+		if (!isset($UBAR_GLOB['UBAR_ROOT'])) {
+			$UBAR_GLOB['UBAR_ROOT'] = realpath(dirname(__FILE__) . "/../") . DIRECTORY_SEPARATOR;
+			getClassPaths($UBAR_GLOB['UBAR_ROOT'] . "constants", TRUE);
+			getClassPaths($UBAR_GLOB['UBAR_ROOT'] . "exception", TRUE);
+			getClassPaths($UBAR_GLOB['UBAR_ROOT'] . "core", TRUE);
 		}
 
 		// defualt to us english, if you need to change locally, might need to reset when done with test

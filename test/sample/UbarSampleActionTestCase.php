@@ -9,9 +9,7 @@ abstract class UbarSampleActionTestCase extends UbarBaseActionTestCase {
 	public function __construct() {
 		// override the config properties
 		// TODO: sort out how to put in database credentials without exposing to svn
-		if(!defined('UBAR_CONFIG_OVERRIDE')) {
-			define('UBAR_CONFIG_OVERRIDE', __DIR__ . "/ubar_sample_config.properties");
-		}
+		$UBAR_GLOB['UBAR_CONFIG_OVERRIDE'] = __DIR__ . "/ubar_sample_config.properties";
 
 		// construct with sample action config
 		parent::__construct(__DIR__ . "/ubar_sample.xml");

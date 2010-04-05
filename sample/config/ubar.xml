@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE actionMappings SYSTEM "ubar.dtd">
+
+<actionMappings>
+	<!-- when the request is "", find the action with the below name -->
+	<defaultAction name="Home" />
+	
+	<!-- action class to use when no action class is specified -->
+	<dummyAction path="AlwaysSuccess" />
+	
+	<!-- common results that do not change across actions -->
+	<globalResults>
+		<result name="ERROR" type="page" template="default">pages.error</result>
+	</globalResults>
+	
+	<!-- templates to render page within, add template=TEMPLATE_NAME to an action def to use -->
+	<templates>
+		<template name="default" path="templates.default" />
+		<template name="portfolio" extends="default">
+			<param name="section" value="portfolio" />
+		</template>
+		
+		<template name="simple" extends="templates.simple" />
+	</templates>
+	
+	<!-- action definitions, must have a name to refer to by, dot separated path to class def -->
+	<!-- if no action class def, try to just do view -->
+	<!-- @type - what type of render response on action completion
+		"page" renderes a page in markup and requires a valid view def
+		"json" renders assembled data as json notation using a standard json serialization
+		"action" requires that you redirect to another action after completing the work if the given action
+		"url" redirects to the given url
+		"file" loads the specified file
+	-->
+	<!-- @view - location of php file to render the view. this should have access to public methods of the action and base action -->
+	
+	<actions>
+		<!-- Base Pages -->
+		<action name="Home" path="AlwaysSuccess" view="pages.home" template="default" />
+		<action name="Contact" path="AlwaysSuccess" view="pages.contact" template="default" titleKey="contact.title" />
+		<action name="Resume" path="AlwaysSuccess" view="pages.resume" template="default" />
+		<action name="Privacy" path="AlwaysSuccess" view="pages.privacy" template="default" />
+		<action name="Bio" path="AlwaysSuccess" view="pages.bio" template="default" />
+		<action name="Framework" path="AlwaysSuccess" view="pages.framework" template="default" section="framework" titleKey="framework.title" />
+		
+		<!-- Admin -->
+		<action name="Login" path="Login" view="pages.login" template="default" />
+		<action name="ValidateCredentials" path="ValidateCredentials">
+			<results>
+				<result type="url">${referringPage}</result>
+				<result name="USER_ERROR" type="url">Login.action?referringPage=${referringPage}</result>
+			</results>
+		</action>
+		<action name="LogOut" path="LogOut">
+			<results>
+				<result type="url">${referringPage}</result>
+			</results>
+		</action>
+		<action name="EditAccount" path="EditAccount" view="pages.editAccount" template="default" />
+		<action name="UpdateAccount" path="UpdateAccount">
+			<results>
+				<result type="action">EditAccount</result>
+				<result name="USER_ERROR" type="action">EditAccount</result>
+			</results>
+		</action>
+
+		<!-- Blog -->
+		<action name="Blog" path="blog.Blog" view="pages.blog" template="default" section="blog" />
+		<action name="PostBlog" path="blog.PostBlog">
+			<results>
+				<result type="action">Blog</result>
+				<result name="USER_ERROR" type="action">Blog</result>
+			</results>
+		</action>
+		<action name="PostBlogComment" path="blog.PostBlogComment">
+			<results>
+				<result type="url">Blog.action?blogId=${blogId}</result>
+				<result name="USER_ERROR" type="url">Blog.action?blogId=${blogId}#comments</result>
+			</results>
+		</action>
+		<action name="DeleteBlogComment" path="blog.DeleteBlogComment">
+			<results>
+				<result type="url">Blog.action?blogId=${blogId}</result>
+				<result name="USER_ERROR" type="url">Blog.action?blogId=${blogId}</result>
+			</results>
+		</action>
+		<action name="DeleteBlogPost" path="blog.DeleteBlogPost">
+			<results>
+				<result type="action">Blog</result>
+				<result name="USER_ERROR" type="url">Blog.action?blogId=${blogId}</result>
+			</results>
+		</action>
+		<action name="PostBlogUpdate" path="blog.PostBlogUpdate">
+			<results>
+				<result type="url">Blog.action?blogId=${blogId}</result>
+				<result name="USER_ERROR" type="url">Blog.action?blogId=${blogId}</result>
+			</results>
+		</action>
+		<action name="PostBlogCommentUpdate" path="blog.PostBlogCommentUpdate">
+			<results>
+				<result type="url">Blog.action?blogId=${blogId}</result>
+				<result name="USER_ERROR" type="url">Blog.action?blogId=${blogId}</result>
+			</results>
+		</action>
+		
+		<!-- portfolio -->
+		<action name="FineArt" view="pages.portfolio.fineArt" template="portfolio" titleKey="fineArt.title" subSection="fineArt" />
+		<action name="Programming" view="pages.portfolio.programming" template="portfolio" titleKey="programming.title" subSection="programming" />
+		<action name="ProductDesign" view="pages.portfolio.productDesign" template="portfolio" titleKey="productDesign.title" subSection="productDesign" />		
+	</actions>
+</actionMappings>

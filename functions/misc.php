@@ -32,10 +32,11 @@
 function __autoload($className) {
 	global $classes;
 	$filename = $className . ".php";
-	if (isset ($classes[$filename])) {
+	if (isset($classes[$filename])) {
 		// use require instead of require_once since never get here with this class already defined
 		require($classes[$filename]);
 	} else {
+		// die(print_r($classes, true));
 		throw new Exception("Failed to autoload class \"$className\".");
 		// log that failed to find class through auto-loading
 	}
@@ -137,7 +138,9 @@ function exceptionHandler($e) {
  * @param class $object Object to render.
  */
 function debug($object) {
-	if (DEV_MODE) {
+	global $UBAR_GLOB;
+
+	if ($UBAR_GLOB['DEV_MODE']) {
 		if (is_object($object) || is_array($object)) {
 			echo "<pre>";
 			print_r($object);

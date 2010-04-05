@@ -2,10 +2,21 @@
 require_once (__DIR__ . "/../UbarBaseTestCase.php");
 class LocalizedPropertiesTest extends UbarBaseTestCase {
 
+	private function init() {
+		global $UBAR_GLOB;
+
+		$UBAR_GLOB['PROPERTIES_ROOT'] = "sample";
+		$UBAR_GLOB['LOCALE_DEFAULT'] = "english-usa,en_US.utf8";
+		$UBAR_GLOB['PROPERTIES_PATH'] = __DIR__ . "/../data/";
+		$UBAR_GLOB['LOCALE'] = 'de';
+	}
+
 	function testFileRetrieval() {
+		global $UBAR_GLOB;
+
 		// define required properties
-		define("PROPERTIES_ROOT", "sample");
-		define("LOCALE_DEFAULT", "english-usa,en_US.utf8");
+		$UBAR_GLOB['PROPERTIES_ROOT'] = "sample";
+		$UBAR_GLOB['LOCALE_DEFAULT'] = "english-usa,en_US.utf8";
 
 		$goodPath = __DIR__ . "/../data/";
 		$badPath = $goodPath . "bad/";
@@ -25,11 +36,11 @@ class LocalizedPropertiesTest extends UbarBaseTestCase {
 		$german = new LocalizedProperties("de", $goodPath);
 
 		// define path and use default
-		define("PROPERTIES_PATH", __DIR__ . "/../data/");
+		$UBAR_GLOB['PROPERTIES_PATH'] = __DIR__ . "/../data/";
 		new LocalizedProperties(null, null);
 
 		// define path and locale and use defaults
-		define("LOCALE", "de");
+		$UBAR_GLOB['LOCALE'] = 'de';
 		// confirm used set locale
 		$germanDefault = new LocalizedProperties(null, null);
 		$this->assertEquals("this is overridden with the given locale", $germanDefault->get("sample.overridden"));
@@ -40,19 +51,17 @@ class LocalizedPropertiesTest extends UbarBaseTestCase {
 
 	}
 
-	/**
-	 * @depends testFileRetrieval
-	 */
 	function testCommentsStripping() {
+		$this->init();
+
 		$properties = new LocalizedProperties();
 		$this->assertEquals("sample.commentedOut", $properties->get("sample.commentedOut"));
 
 	}
 
-	/**
-	 * @depends testFileRetrieval
-	 */
 	function testMissingKey() {
+		$this->init();
+
 		$properties = new LocalizedProperties();
 		try {
 			$this->assertEquals("sample.commentedOut", $properties->get("sample.commentedOut", array (), true));
@@ -62,28 +71,25 @@ class LocalizedPropertiesTest extends UbarBaseTestCase {
 		}
 	}
 
-	/**
-	 * @depends testFileRetrieval
-	 */
 	function testDefault() {
+		$this->init();
+
 		$properties = new LocalizedProperties();
 		$this->assertEquals("This is a simple message string with no substitutions.", $properties->get("sample.simple"));
 	}
 
-	/**
-	 * @depends testFileRetrieval
-	 */
 	function testArguments() {
+		$this->init();
+
 		$properties = new LocalizedProperties();
 		$this->assertEquals("1 dog should be pluralized and number formatted correctly. The provided argument was '1'.", $properties->get("sample.plural", array(1)));
 
 		$this->assertEquals("1 dog should be pluralized and number formatted correctly. The provided argument was '1'.", $properties->get("sample.plural", 1));
 	}
 
-	/**
-	 * @depends testFileRetrieval
-	 */
 	function testOverride() {
+		$this->init();
+
 		$properties = new LocalizedProperties("de");
 		$this->assertEquals("this is overridden with the given locale", $properties->get("sample.overridden"));
 	}

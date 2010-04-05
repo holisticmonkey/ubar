@@ -19,7 +19,7 @@ class UbarAllTests extends UbarTestSuite {
 		// sample - currently tests against src, not dist code
 		// TODO: modify tests to require building sample app with dist version
 		// of lib. Possibly just put tests into the sample?
-		//$suite->addTestSuite('BasicTest');
+		$suite->addTestSuite('BasicTest');
 
 		return $suite;
 	}

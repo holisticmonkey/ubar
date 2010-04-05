@@ -26,8 +26,10 @@ class ActionNotFoundException extends UbarBaseException {
 	 * @todo Get message from properties file? Possibly dangerous in exceptions.
 	 */
 	public function __construct($actionDef) {
+		global $UBAR_GLOB;
+
 		// assemble message
-		$message = "The action class \"" . $actionDef->getClassName() . "\" was not found at \"" . BASE_ACTION_PATH . $actionDef->getActionLocation() . "\".";
+		$message = "The action class \"" . $actionDef->getClassName() . "\" was not found at \"" . $UBAR_GLOB['BASE_ACTION_PATH'] . $actionDef->getActionLocation() . "\".";
 		// make sure everything is assigned properly
 		parent :: __construct($message, $this->getCodeFromProperties());
 	}

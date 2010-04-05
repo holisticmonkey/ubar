@@ -39,8 +39,10 @@ class DBManager {
 	 * @throws An exception when required fields were not defined.
 	 */
 	public function __construct() {
-		if (defined("DB_SERVER") && defined("DB_USERNAME") && defined("DB_PASSWORD") && defined("DB_NAME")) {
-			$result = $this->connect(DB_SERVER, DB_USERNAME, DB_PASSWORD, DB_NAME, true);
+		global $UBAR_GLOB;
+
+		if (isset($UBAR_GLOB['DB_SERVER']) && isset($UBAR_GLOB['DB_USERNAME']) && isset($UBAR_GLOB['DB_PASSWORD']) && isset($UBAR_GLOB['DB_NAME'])) {
+			$result = $this->connect($UBAR_GLOB['DB_SERVER'], $UBAR_GLOB['DB_USERNAME'], $UBAR_GLOB['DB_PASSWORD'], $UBAR_GLOB['DB_NAME'], true);
 			if (!$result) {
 				throw new Exception("Unable to connect to the database with the given credentials");
 			}
@@ -143,6 +145,8 @@ class DBManager {
 	 * entry found in the database.
 	 */
 	public function getVersion() {
+		global $UBAR_GLOB;
+
 		$result = mysql_query("SHOW TABLES LIKE 'ubarmetainfo'");
 		if (!$result) {
 			throw new Exception('Could not execute query:' . mysql_error());
@@ -150,7 +154,7 @@ class DBManager {
 
 		// table does not exist, create it and indicate on version 0
 		if (mysql_num_rows($result) == 0) {
-			$this->runFile(UBAR_ROOT . "bootstrap.sql");
+			$this->runFile($UBAR_GLOB['UBAR_ROOT'] . "bootstrap.sql");
 			return 0;
 		}
 
@@ -179,16 +183,18 @@ class DBManager {
 	 * metainfo table.
 	 */
 	public function checkVersion() {
-		if (defined("SCHEMA_PATH") && defined("SCHEMA_VERSION") && !is_null(SCHEMA_PATH) && !is_null(SCHEMA_VERSION)) {
+		global $UBAR_GLOB;
+
+		if (isset($UBAR_GLOB['SCHEMA_PATH']) && isset($UBAR_GLOB['SCHEMA_VERSION']) && !is_null($UBAR_GLOB['SCHEMA_PATH']) && !is_null($UBAR_GLOB['SCHEMA_VERSION'])) {
 			$version = $this->getVersion();
-			if ($version < SCHEMA_VERSION) {
-				$rootName = SCHEMA_PATH;
-				for ($i = $version + 1; $i <= SCHEMA_VERSION; $i++) {
-					$curPath = str_replace("*", $i, SCHEMA_PATH);
-					$this->runFile(UBAR_ROOT . $curPath);
+			if ($version < $UBAR_GLOB['SCHEMA_VERSION']) {
+				$rootName = $UBAR_GLOB['SCHEMA_PATH'];
+				for ($i = $version + 1; $i <= $UBAR_GLOB['SCHEMA_VERSION']; $i++) {
+					$curPath = str_replace("*", $i, $UBAR_GLOB['SCHEMA_PATH']);
+					$this->runFile($UBAR_GLOB['UBAR_ROOT'] . $curPath);
 				}
 				// update version in db
-				$result = mysql_query("UPDATE ubarmetainfo SET val=" . SCHEMA_VERSION . " WHERE name='schemaversion'");
+				$result = mysql_query("UPDATE ubarmetainfo SET val=" . $UBAR_GLOB['SCHEMA_VERSION'] . " WHERE name='schemaversion'");
 				if (!$result) {
 					throw new Exception('Could not execute query:' . mysql_error());
 				}

@@ -14,30 +14,39 @@
  */
 
 /**
+ * Global that stores all application constants. Using this instead of actual
+ * constants due to lack of sandboxing in phpunit tests.
+ */
+global $UBAR_GLOB;
+if(!isset($UBAR_GLOB)) {
+	$UBAR_GLOB = array();
+}
+
+/**
  * Define the root of the framework as the current folder.
  */
-if(!defined('UBAR_ROOT')) {
-	define('UBAR_ROOT', dirname(__FILE__) . "/");
+if(!isset($UBAR_GLOB['UBAR_ROOT'])) {
+	$UBAR_GLOB['UBAR_ROOT'] = dirname(__FILE__) . "/";
 }
 
 /**
  * Define the library folder location. This is a helper for calls to other
  * libray folders.
  */
-define('LIB_ROOT', UBAR_ROOT . "../");
+$UBAR_GLOB['LIB_ROOT'] = $UBAR_GLOB['UBAR_ROOT'] . "../";
 
 /**
  * Require necessary application functions.
  * TODO: When more function files, require the entire folder recursively.
  */
-require_once (UBAR_ROOT . "/functions/misc.php");
+require_once($UBAR_GLOB['UBAR_ROOT'] . "/functions/misc.php");
 
 /**
  * Add the constants, exception, and core folders recursively
  */
-getClassPaths(UBAR_ROOT . "constants", TRUE);
-getClassPaths(UBAR_ROOT . "exception", TRUE);
-getClassPaths(UBAR_ROOT . "core", TRUE);
+getClassPaths($UBAR_GLOB['UBAR_ROOT'] . "constants", TRUE);
+getClassPaths($UBAR_GLOB['UBAR_ROOT'] . "exception", TRUE);
+getClassPaths($UBAR_GLOB['UBAR_ROOT'] . "core", TRUE);
 
 /**
  * Allow recognition of all line ending types, required to recognize mac
@@ -49,10 +58,10 @@ ini_set("auto_detect_line_endings", true);
  * Get an instance of the config properties. Allow path to be overridden for
  * testing purposes.
  */
-if(defined('UBAR_CONFIG_OVERRIDE')) {
-	$props = new Properties(UBAR_CONFIG_OVERRIDE, true);
+if(isset($UBAR_GLOB['UBAR_CONFIG_OVERRIDE'])) {
+	$props = new Properties($UBAR_GLOB['UBAR_CONFIG_OVERRIDE'], true);
 } else {
-	$props = new Properties(UBAR_ROOT . "ubar_config.properties", true);
+	$props = new Properties($UBAR_GLOB['UBAR_ROOT'] . "ubar_config.properties", true);
 }
 
 # DEFINE CONSTANTS FROM PROPERTIES FILE
@@ -65,101 +74,103 @@ if(defined('UBAR_CONFIG_OVERRIDE')) {
  *
  * @see GlobalConstants::DEV_MODE
  */
-if(!defined('DEV_MODE')) {
-	define('DEV_MODE', $props->getBool('DEV_MODE', GlobalConstants :: DEV_MODE));
+if(!isset($UBAR_GLOB['DEV_MODE'])) {
+	$UBAR_GLOB['DEV_MODE'] = $props->getBool('DEV_MODE', GlobalConstants :: DEV_MODE);
 }
 
 /**
  * Define a property appender based on dev mode to simplify the dev mode value
  * retrieval
  */
-define('PROP_APPEND', DEV_MODE ? '_DEV_MODE' : '');
+$UBAR_GLOB['PROP_APPEND'] = $UBAR_GLOB['DEV_MODE'] ? '_DEV_MODE' : '';
 
 /**
  * Define the default locale.
  * @see GlobalConstants::LOCALE_DEFAULT
  */
-define('LOCALE_DEFAULT', $props->get('LOCALE_DEFAULT', GlobalConstants :: LOCALE_DEFAULT));
+$UBAR_GLOB['LOCALE_DEFAULT'] = $props->get('LOCALE_DEFAULT', GlobalConstants :: LOCALE_DEFAULT);
 
 /**
  * Define display errors flag.
  * @see GlobalConstants::DISPLAY_ERRORS
  */
-define('DISPLAY_ERRORS', $props->getBool('DISPLAY_ERRORS', GlobalConstants :: DISPLAY_ERRORS));
+$UBAR_GLOB['DISPLAY_ERRORS'] = $props->getBool('DISPLAY_ERRORS', GlobalConstants :: DISPLAY_ERRORS);
 
 /**
  * Define display html errors (vs plain text).
  * @see GlobalConstants::HTML_ERRORS
  */
-define('HTML_ERRORS', $props->getBool('HTML_ERRORS', GlobalConstants :: HTML_ERRORS));
+$UBAR_GLOB['HTML_ERRORS'] = $props->getBool('HTML_ERRORS', GlobalConstants :: HTML_ERRORS);
 
 /**
- * Define error display level.
+ * Define error display level. Currently unused.
  * @see GlobalConstants::ERROR_LEVEL
+ *
+ * @todo switch to int values and make use of this
  */
-define('ERROR_LEVEL', $props->get('ERROR_LEVEL' . PROP_APPEND, GlobalConstants :: ERROR_LEVEL));
+$UBAR_GLOB['ERROR_LEVEL'] = $props->get('ERROR_LEVEL' . $UBAR_GLOB['PROP_APPEND'], GlobalConstants :: ERROR_LEVEL);
 
 /**
- * Define log errors flag. Currently unused
+ * Define log errors flag. Currently unused.
  * @see GlobalConstants::LOG_ERRORS
  */
-define('LOG_ERRORS', $props->getBool('LOG_ERRORS' . PROP_APPEND, GlobalConstants :: LOG_ERRORS));
+$UBAR_GLOB['LOG_ERRORS'] = $props->getBool('LOG_ERRORS' . $UBAR_GLOB['PROP_APPEND'], GlobalConstants :: LOG_ERRORS);
 
 /**
- * Define magic quotes flag.
+ * Define magic quotes flag. Currently unused.
  * @see GlobalConstants::MAGIC_QUOTES
  */
-define('MAGIC_QUOTES', $props->getBool('MAGIC_QUOTES', GlobalConstants :: MAGIC_QUOTES));
+$UBAR_GLOB['MAGIC_QUOTES'] = $props->getBool('MAGIC_QUOTES', GlobalConstants :: MAGIC_QUOTES);
 
 /**
  * Define session lifetime in seconds.
  * @see GlobalConstants::SESSION_LIFETIME
  */
-define('SESSION_LIFETIME', $props->get('SESSION_LIFETIME', GlobalConstants :: SESSION_LIFETIME));
+$UBAR_GLOB['SESSION_LIFETIME'] = $props->get('SESSION_LIFETIME', GlobalConstants :: SESSION_LIFETIME);
 
 /**
  * Define default charset.
  * @see GlobalConstants::CHARSET
  */
-define('CHARSET', $props->get('CHARSET', GlobalConstants :: CHARSET));
+$UBAR_GLOB['CHARSET'] = $props->get('CHARSET', GlobalConstants :: CHARSET);
 
 /**
  * Define xhtml (vs html) flag.
  * @see GlobalConstants::USE_XHTML
  */
-define('USE_XHTML', $props->getBool('USE_XHTML', GlobalConstants :: USE_XHTML));
+$UBAR_GLOB['USE_XHTML'] = $props->getBool('USE_XHTML', GlobalConstants :: USE_XHTML);
 
 /**
  * Define path to properties folder relative to UBAR_ROOT.
  * @see GlobalConstants::BASE_PROPERTIES_PATH
  */
-define('PROPERTIES_PATH', UBAR_ROOT . "/" . $props->get('PROPERTIES_PATH' . PROP_APPEND, GlobalConstants :: BASE_PROPERTIES_PATH));
+$UBAR_GLOB['PROPERTIES_PATH'] = $UBAR_GLOB['UBAR_ROOT'] . "/" . $props->get('PROPERTIES_PATH' . $UBAR_GLOB['PROP_APPEND'], GlobalConstants :: BASE_PROPERTIES_PATH);
 
 /**
  * Define path to properties root name.
  * @see GlobalConstants::PROPERTIES_ROOT
  */
-define('PROPERTIES_ROOT', $props->get('PROPERTIES_ROOT', GlobalConstants :: PROPERTIES_ROOT));
+$UBAR_GLOB['PROPERTIES_ROOT'] = $props->get('PROPERTIES_ROOT', GlobalConstants :: PROPERTIES_ROOT);
 
 /**
  * Define path to action folder. It is not recommended that you alter this.
 
  * @see GlobalConstants::BASE_ACTION_PATH
  */
-define('BASE_ACTION_PATH', UBAR_ROOT . "/" . $props->get('BASE_ACTION_PATH' . PROP_APPEND, GlobalConstants :: BASE_ACTION_PATH));
-if (!is_dir( BASE_ACTION_PATH)) {
-	throw new Exception("Unable to find specified action root path at \"" . BASE_ACTION_PATH . "\".");
+$UBAR_GLOB['BASE_ACTION_PATH'] = $UBAR_GLOB['UBAR_ROOT'] . "/" . $props->get('BASE_ACTION_PATH' . $UBAR_GLOB['PROP_APPEND'], GlobalConstants :: BASE_ACTION_PATH);
+if (!is_dir( $UBAR_GLOB['BASE_ACTION_PATH'])) {
+	throw new Exception("Unable to find specified action root path at \"" . $UBAR_GLOB['BASE_ACTION_PATH'] . "\".");
 }
-getClassPaths(BASE_ACTION_PATH, TRUE);
+getClassPaths($UBAR_GLOB['BASE_ACTION_PATH'], TRUE);
 
 /**
  * Define path to view folder. It is not recommended that you alter this.
 
  * @see GlobalConstants::BASE_VIEW_PATH
  */
-define('BASE_VIEW_PATH', UBAR_ROOT . "/" . $props->get('BASE_VIEW_PATH' . PROP_APPEND, GlobalConstants :: BASE_VIEW_PATH));
-if (!is_dir(BASE_VIEW_PATH)) {
-	throw new Exception("Unable to find specified view root path at \"" . BASE_VIEW_PATH . "\".");
+$UBAR_GLOB['BASE_VIEW_PATH'] = $UBAR_GLOB['UBAR_ROOT'] . "/" . $props->get('BASE_VIEW_PATH' . $UBAR_GLOB['PROP_APPEND'], GlobalConstants :: BASE_VIEW_PATH);
+if (!is_dir($UBAR_GLOB['BASE_VIEW_PATH'])) {
+	throw new Exception("Unable to find specified view root path at \"" . $UBAR_GLOB['BASE_VIEW_PATH'] . "\".");
 }
 
 /**
@@ -170,9 +181,9 @@ if (!is_dir(BASE_VIEW_PATH)) {
 
  * @see GlobalConstants::BASE_MODEL_PATH
  */
-define('BASE_MODEL_PATH', UBAR_ROOT . "/" . $props->get('BASE_MODEL_PATH' . PROP_APPEND, GlobalConstants :: BASE_MODEL_PATH));
-if (is_dir(BASE_MODEL_PATH)) {
-	getClassPaths(BASE_MODEL_PATH, TRUE);
+$UBAR_GLOB['BASE_MODEL_PATH'] = $UBAR_GLOB['UBAR_ROOT'] . "/" . $props->get('BASE_MODEL_PATH' . $UBAR_GLOB['PROP_APPEND'], GlobalConstants :: BASE_MODEL_PATH);
+if (is_dir($UBAR_GLOB['BASE_MODEL_PATH'])) {
+	getClassPaths($UBAR_GLOB['BASE_MODEL_PATH'], TRUE);
 }
 
 // define default timezone
@@ -180,7 +191,7 @@ try {
 	/**
 	 * Define default timezone. If not defined, it will throw an exception that is ignored.
 	 */
-	define('TIMEZONE_DEFAULT', $props->get('TIMEZONE_DEFAULT'));
+	$UBAR_GLOB['TIMEZONE_DEFAULT'] = $props->get('TIMEZONE_DEFAULT');
 } catch (Exception $e) {
 	// none defined, skip
 }
@@ -194,25 +205,25 @@ try {
  *
  * @see GlobalConstants::DB_USE
  */
-define('DB_USE', $props->getBool('DB_USE', GlobalConstants :: DB_USE));
-if (DB_USE) {
+$UBAR_GLOB['DB_USE'] = $props->getBool('DB_USE', GlobalConstants :: DB_USE);
+if ($UBAR_GLOB['DB_USE']) {
 	try {
 		/**
 		 * Define database server name.
 		 */
-		define('DB_SERVER', $props->get('DB_SERVER' . PROP_APPEND));
+		$UBAR_GLOB['DB_SERVER'] = $props->get('DB_SERVER' . $UBAR_GLOB['PROP_APPEND']);
 		/**
 		 * Define database username.
 		 */
-		define('DB_USERNAME', $props->get('DB_USERNAME' . PROP_APPEND));
+		$UBAR_GLOB['DB_USERNAME'] = $props->get('DB_USERNAME' . $UBAR_GLOB['PROP_APPEND']);
 		/**
 		 * Define database password for user.
 		 */
-		define('DB_PASSWORD', $props->get('DB_PASSWORD' . PROP_APPEND));
+		$UBAR_GLOB['DB_PASSWORD'] = $props->get('DB_PASSWORD' . $UBAR_GLOB['PROP_APPEND']);
 		/**
 		 * Define default database to connect to.
 		 */
-		define('DB_NAME', $props->get('DB_NAME' . PROP_APPEND));
+		$UBAR_GLOB['DB_NAME'] = $props->get('DB_NAME' . $UBAR_GLOB['PROP_APPEND']);
 	} catch (Exception $e) {
 		throw new Exception("This application is configured to connect to a database but one or more required configurations was missing");
 	}
@@ -220,12 +231,12 @@ if (DB_USE) {
 		/**
 		 * Define current schema version, used for automatic schema migration.
 		 */
-		define('SCHEMA_VERSION', $props->get('SCHEMA_VERSION'));
+		$UBAR_GLOB['SCHEMA_VERSION'] = $props->get('SCHEMA_VERSION');
 		/**
 		 * Define schema naming convention for .sql files used for automatic
 		 * schema migration.
 		 */
-		define('SCHEMA_PATH', $props->get('SCHEMA_PATH'));
+		$UBAR_GLOB['SCHEMA_PATH'] = $props->get('SCHEMA_PATH');
 	} catch (Exception $e) {
 		// values allowed to be undefined
 	}
@@ -234,15 +245,17 @@ if (DB_USE) {
 # CONFIGURE APPLICATION BASED ON PROPERTIES
 
 # SET HTML IN ERRORS
-ini_set('html_errors', HTML_ERRORS ? GLobalConstants :: INI_OFF : GLobalConstants :: INI_ON);
+ini_set('html_errors', $UBAR_GLOB['HTML_ERRORS'] ? GLobalConstants :: INI_OFF : GLobalConstants :: INI_ON);
 
 # CONFIGURE ERROR DISPLAY
-ini_set('display_errors', (DEV_MODE || DISPLAY_ERRORS) ? GLobalConstants :: INI_ON : GLobalConstants :: INI_OFF);
+ini_set('display_errors', ($UBAR_GLOB['DEV_MODE'] || $UBAR_GLOB['DISPLAY_ERRORS']) ? GLobalConstants :: INI_ON : GLobalConstants :: INI_OFF);
+// TODO: current properties values won't work since they refer to php constants, switch to int values
+// see http://www.php.net/manual/en/errorfunc.configuration.php#ini.error-reporting
 ini_set('error_reporting', E_ALL | E_STRICT);
 
 # SET CUSTOM ERROR HANDLERS
 if (function_exists("errorHandler")) {
-	set_error_handler("errorHandler", E_ALL);
+	set_error_handler("errorHandler", E_ALL | E_STRICT);
 }
 if (function_exists("exceptionHandler")) {
 	set_exception_handler("exceptionHandler");
@@ -253,13 +266,13 @@ if (function_exists("exceptionHandler")) {
 
 # SET CONDITIONAL HEADERS FOR XHTML
 $contentType = "text/html";
-if (USE_XHTML && stristr($_SERVER["HTTP_ACCEPT"], "application/xhtml+xml")) {
+if ($UBAR_GLOB['USE_XHTML'] && stristr($_SERVER["HTTP_ACCEPT"], "application/xhtml+xml")) {
 	$contentType = 'application/xhtml+xml';
 }
-header("Content-Type: $contentType;charset=" . CHARSET);
+header("Content-Type: $contentType;charset=" . $UBAR_GLOB['CHARSET']);
 
 # set session lifetime
-ini_set('session.gc_maxlifetime', SESSION_LIFETIME);
+ini_set('session.gc_maxlifetime', $UBAR_GLOB['SESSION_LIFETIME']);
 
 # start session
 session_start();
@@ -286,8 +299,8 @@ if(isset($_SESSION['userid'])) {
 // get from user if present and set
 // default if no value or value from user not valid
 // TODO: consider moving this to controller and allowing project to override?
-if (defined('TIMEZONE_DEFAULT')) {
-	date_default_timezone_set(TIMEZONE_DEFAULT);
+if (isset($UBAR_GLOB['TIMEZONE_DEFAULT'])) {
+	date_default_timezone_set($UBAR_GLOB['TIMEZONE_DEFAULT']);
 }
 
 # set locale
@@ -300,12 +313,12 @@ if (defined('TIMEZONE_DEFAULT')) {
 
 //http://us.php.net/setlocale
 // temp assignment of locale to default for dev purposes
-$localeNameArray = LOCALE_DEFAULT;
+$localeNameArray = $UBAR_GLOB['LOCALE_DEFAULT'];
 // TODO: should I put a fallback here?
 // ex $loc_de = setlocale(LC_ALL, 'de_DE@euro', 'de_DE', 'de', 'ge');
 // set locale and retrieve locale string
 //TODO: strip whitespace before doing explode
 $currentLocale = setlocale(LC_ALL, explode(",", $localeNameArray));
 // set locale string to a constant to be used by property and resource retrieval
-define('LOCALE', $currentLocale);
+$UBAR_GLOB['LOCALE'] = $currentLocale;
 ?>

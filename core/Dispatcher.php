@@ -151,6 +151,8 @@ class Dispatcher {
 	 * found.
 	 */
 	public function getAction($actionString = null) {
+		global $UBAR_GLOB;
+
 		// no override to action name, get from url
 		if (is_null($actionString)) {
 			// match action part of the URI
@@ -188,16 +190,16 @@ class Dispatcher {
 			// to tempates and similar
 			$dummyOverride = $this->actionMapper->getDummyActionPath();
 			if(is_null($dummyOverride)) {
-				$actionRealPath = UBAR_ROOT . '/core/' . GlobalConstants :: DUMMY_ACTION . '.php';
+				$actionRealPath = $UBAR_GLOB['UBAR_ROOT'] . '/core/' . GlobalConstants :: DUMMY_ACTION . '.php';
 			} else {
 				// mostly set for debugging purposes
 				$this->actionDef->setActionLocation($dummyOverride);
-				$actionRealPath = BASE_ACTION_PATH . $dummyOverride;
+				$actionRealPath = $UBAR_GLOB['BASE_ACTION_PATH'] . $dummyOverride;
 				$actionClassName = FileUtils::classFromFile($dummyOverride);
 				$this->actionDef->setClassName($actionClassName);
 			}
 		} else {
-			$actionRealPath = BASE_ACTION_PATH . $this->actionDef->getActionLocation();
+			$actionRealPath = $UBAR_GLOB['BASE_ACTION_PATH'] . $this->actionDef->getActionLocation();
 		}
 		if (!file_exists($actionRealPath)) {
 			throw new ActionNotFoundException($this->actionDef);
@@ -276,6 +278,8 @@ class Dispatcher {
 	 *
 	 */
 	public function showResult() {
+		global $UBAR_GLOB;
+
 		// no def and not default, look for it in global results
 		if ($this->resultDef == null) {
 			switch ($this->resultString) {
@@ -287,8 +291,7 @@ class Dispatcher {
 					// TODO: build in a default error representation
 					// since no error result found, just dump the errors
 					echo("Unable to find default error representation, overridable by having a global result for ERROR<br />");
-					print_r($this->action->getErrors());
-					die();
+					die(print_r($this->action->getErrors(), true));
 					break;
 				default :
 					throw new Exception("No definition found for result string $resultString for the action definition $actionClassName");
@@ -301,14 +304,14 @@ class Dispatcher {
 				// make a new request so there is no redeclaration or confusion with request params
 				// NOTE: this is less efficient but safer
 				// TODO: get possible override for action identifier instead of hardcoding ".action"
-				header('Location: ' . $resultDef->getTarget() . ".action");
+				header('Location: ' . $this->resultDef->getTarget() . ".action");
 				break;
 			case GlobalConstants :: PAGE_TYPE :
 				// pass in possible overrides for page and template
 				$this->renderPage($this->resultDef);
 				break;
 			case GlobalConstants :: FILE_TYPE :
-				require_once (BASE_VIEW_PATH . $this->resultDef->getTarget());
+				require_once ($UBAR_GLOB['BASE_VIEW_PATH'] . $this->resultDef->getTarget());
 				return;
 			case GlobalConstants :: URL_TYPE :
 				if (Str :: nullOrEmpty($this->resultDef->getTarget())) {
@@ -341,12 +344,14 @@ class Dispatcher {
 	 * @see Dispatcher::renderPage()
 	 */
 	private function initView(Result $result) {
+		global $UBAR_GLOB;
+
 		$viewPath = $result->getViewLocation();
 		if(is_null($viewPath)) {
 			$viewPath = $this->actionDef->getViewLocation();
 		}
 		if (!is_null($viewPath)) {
-			$viewRealPath = BASE_VIEW_PATH . $viewPath;
+			$viewRealPath = $UBAR_GLOB['BASE_VIEW_PATH'] . $viewPath;
 			if (!file_exists($viewRealPath) || !is_file($viewRealPath)) {
 				throw new ViewNotFoundException($viewRealPath);
 			} else {
@@ -370,6 +375,8 @@ class Dispatcher {
 	 * @see Dispatcher::dispatch()
 	 */
 	public function renderPage(Result $result) {
+		global $UBAR_GLOB;
+
 		// set the view or throw error if not defined
 		$this->initView($result);
 
@@ -388,7 +395,7 @@ class Dispatcher {
 				throw new Exception("No template found with the name $templateName.");
 			}
 
-			$templateRealPath = BASE_VIEW_PATH . $templateDef->getPath();
+			$templateRealPath = $UBAR_GLOB['BASE_VIEW_PATH'] . $templateDef->getPath();
 			if (!file_exists($templateRealPath) || is_dir($templateRealPath)) {
 				throw new Exception("The template file \"" . $templateRealPath . "\", from template def, \"" . $templateName . "\", is not a valid file.");
 			}
