@@ -58,5 +58,9 @@ class BasicTest extends UbarSampleActionTestCase {
 		// validate that result string was expected
 		$this->assertResultEquals(GlobalConstants::SUCCESS);
 	}
+
+	public function testNoView() {
+
+	}
 }
 ?>

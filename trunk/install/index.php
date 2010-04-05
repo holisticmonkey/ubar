@@ -25,6 +25,11 @@ $ubarRoot = "../WEB-INF/lib/ubar";
 //TODO: allow ubarRoot to be commented out and still work
 #######################################
 
+global $UBAR_GLOB;
+if(!isset($UBAR_GLOB)) {
+	$UBAR_GLOB = array();
+}
+
 ## Check for PHP Version Information
 define("MIN_PHP_VERSION", "5.1");
 if (version_compare(phpversion(), MIN_PHP_VERSION, "<")) {
@@ -40,7 +45,7 @@ if (!file_exists('.htaccess')) {
 }
 
 ## define web root
-define('WEB_ROOT', dirname(__FILE__) . "/");
+$UBAR_GLOB['WEB_ROOT'] = dirname(__FILE__) . "/";
 
 ## Set Ubar up
 // test that config file exists
@@ -54,7 +59,7 @@ require_once ($initScript);
 
 // get action definitions
 // TODO: get dtd hosted somewhere and allow ubar.xml to be moved
-$dispatcher = new Dispatcher(UBAR_ROOT . "/ubar.xml");
+$dispatcher = new Dispatcher($UBAR_GLOB['UBAR_ROOT'] . "/ubar.xml");
 
 // not that framework is setup, let the controller dispatch the request
 $dispatcher->dispatch();

@@ -1,1 +1,5 @@
 Stub - provide quick start installation instructions and the location to full docs
+
+for install of sample app
+update the sql insert to have an appropriate user and pass
+GRANT ALL PRIVILEGES ON sample.* TO 'user'@'%' IDENTIFIED BY 'password' WITH GRANT OPTION;

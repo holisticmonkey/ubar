@@ -19,11 +19,13 @@ abstract class UbarBaseActionTestCase extends UbarBaseTestCase {
 	protected $messagesCopy = array();
 
 	public function __construct($xmlOverride = null) {
+		global $UBAR_GLOB;
+
 		// construct UbarBaseTestCase first since it does most of the setup
 		parent::__construct();
 
 		// do the setup required for action context material
-		require_once (UBAR_ROOT . "/init.php");
+		require_once ($UBAR_GLOB['UBAR_ROOT'] . "/init.php");
 
 		// override possible 'On' state for html errors since will be in console
 		ini_set('html_errors', 'Off');
@@ -31,7 +33,7 @@ abstract class UbarBaseActionTestCase extends UbarBaseTestCase {
 		// create an instance of the dispatcher, may be overridden for use of
 		// a test action config file
 		if(is_null($xmlOverride)) {
-			$this->dispatcher = new Dispatcher(UBAR_ROOT . "/ubar.xml");
+			$this->dispatcher = new Dispatcher($UBAR_GLOB['UBAR_ROOT'] . "/ubar.xml");
 		} else {
 			$this->dispatcher = new Dispatcher($xmlOverride);
 		}

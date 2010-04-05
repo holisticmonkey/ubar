@@ -89,6 +89,8 @@ class MessageFormat {
 	 * @return string Formatted string.
 	 */
 	public static function get($string, array $arguments = array(), $locale = null) {
+		global $UBAR_GLOB;
+
 		try {
 
 			// array of directives to ignore because no matching argument found
@@ -145,7 +147,7 @@ class MessageFormat {
 		} catch (Exception $e) {
 			// TODO: determine what expected errors can be caught and handle appropriately
 			// something unknown went wrong, make xthml safe since the expression language format will cause xml parse errors
-			if(DEV_MODE) {
+			if($UBAR_GLOB['DEV_MODE']) {
 				throw $e;
 			}
 			$string = htmlspecialchars($string);
@@ -183,6 +185,8 @@ class MessageFormat {
 	 *
 	 */
 	private static function processValue($value, $instructions, $locale = null) {
+		global $UBAR_GLOB;
+
 		$returnString = NULL;
 		$type = NULL;
 		$modifiers = NULL;
@@ -258,7 +262,7 @@ class MessageFormat {
 
 				// not yet suppoprted comparator
 				default:
-					if(DEV_MODE) {
+					if($UBAR_GLOB['DEV_MODE']) {
 						throw new Exception("unsupported comparator \"" . $comparator . "\".");
 					}
 					break;
@@ -272,7 +276,7 @@ class MessageFormat {
 			$date = $value;
 			if(!is_int($value)) {
 				$date = strtotime($value);
-				if($date == FALSE && DEV_MODE) {
+				if($date == FALSE && $UBAR_GLOB['DEV_MODE']) {
 					throw new Exception("Unable to convert $value into a date");
 				}
 			}

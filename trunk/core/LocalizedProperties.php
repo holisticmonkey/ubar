@@ -96,9 +96,11 @@ class LocalizedProperties {
 	 * @param string $path Override to path to properties files.
 	 */
 	public function __construct($locale = NULL, $path = NULL) {
+		global $UBAR_GLOB;
+
 		// use properties root if exists and no override specified
-		if ((!isset ($path) || is_null($path)) && defined('PROPERTIES_PATH')) {
-			$path = PROPERTIES_PATH;
+		if ((!isset ($path) || is_null($path)) && isset($UBAR_GLOB['PROPERTIES_PATH'])) {
+			$path = $UBAR_GLOB['PROPERTIES_PATH'];
 		}
 
 		// verify directory found
@@ -114,28 +116,28 @@ class LocalizedProperties {
 			$this->locale = $locale;
 			//die(print_r($this->locale));
 		} else {
-			if (defined('LOCALE')) {
+			if (isset($UBAR_GLOB['LOCALE'])) {
 				// TODO: convert to Locale instance
-				$this->locale = LOCALE;
+				$this->locale = $UBAR_GLOB['LOCALE'];
 			}
 		}
 
 		// TODO: check if valid locale
 
 		// make sure that default properties file exists
-		$defaultPath = $path . PROPERTIES_ROOT . self::PROPERTIES_APPENDER;
+		$defaultPath = $path . $UBAR_GLOB['PROPERTIES_ROOT'] . self::PROPERTIES_APPENDER;
 		if (!file_exists($defaultPath)) {
 			throw new Exception('Default properties file \'' . $defaultPath . '\' does not exist.');
 		}
 
 		// if this is the default locale or there was no override, set default as main properties
-		if ($this->locale == LOCALE_DEFAULT || Str :: nullOrEmpty($this->locale)) {
+		if ($this->locale == $UBAR_GLOB['LOCALE_DEFAULT'] || Str :: nullOrEmpty($this->locale)) {
 			$this->isDefault = true;
 			$this->properties = file_get_contents($defaultPath);
 			// else, try to get localized properties file
 		} else {
 			$this->defaultProperties = file_get_contents($defaultPath);
-			$localizedPath = $path . PROPERTIES_ROOT . "_" . $this->locale . self::PROPERTIES_APPENDER;
+			$localizedPath = $path . $UBAR_GLOB['PROPERTIES_ROOT'] . "_" . $this->locale . self::PROPERTIES_APPENDER;
 			// if localized file doesn't exist, set default as primary and log that couldn't find localized property file
 			if (!file_exists($localizedPath)) {
 				//throw new Exception('Properties file \'' . $propertiesPath . '\' does not exist.');

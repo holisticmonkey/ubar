@@ -162,10 +162,10 @@ abstract class Action {
 			}
 
 			function getTxt($key, $arguments = array ()) {
-				global $action;
+				global $action, $UBAR_GLOB;
 				// TODO: use dynamic arg retrieval and inspection?
 				//$args = func_num_args();
-				return $action->getProperties()->get($key, $arguments, DEV_MODE);
+				return $action->getProperties()->get($key, $arguments, $UBAR_GLOB['DEV_MODE']);
 			}
 
 			function getParam($key) {
@@ -469,6 +469,8 @@ abstract class Action {
 	 * Dispatcher, or anything else that will prevent accidental collisions.
 	 */
 	public final function set($original, $value) {
+		global $UBAR_GLOB;
+
 		$capName = ucfirst($original);
 		$methodNames = array (
 			$original,
@@ -482,7 +484,7 @@ abstract class Action {
 				return;
 			}
 		}
-		if (DEV_MODE) {
+		if ($UBAR_GLOB['DEV_MODE']) {
 			$this->addWarningSimple("Method ,\"set" . $capName . "()\", was not found in the action");
 		}
 	}

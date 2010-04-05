@@ -3,11 +3,13 @@ require_once(__DIR__ . "/../UbarBaseTestCase.php");
 class PropertiesTest extends UbarBaseTestCase {
 
 	function testConstruct() {
-		// need to use DIRECTORY_SEPARATOR since real path is part of messaging
-		$bad = UBAR_ROOT . "test" . DIRECTORY_SEPARATOR . "data" . DIRECTORY_SEPARATOR . "sample_missing.properties";
-		$good = UBAR_ROOT . "test/data/sample.properties";
+		global $UBAR_GLOB;
 
-		$pathToPropertiesClass = UBAR_ROOT . "core" . DIRECTORY_SEPARATOR . "Properties.php";
+		// need to use DIRECTORY_SEPARATOR since real path is part of messaging
+		$bad = $UBAR_GLOB['UBAR_ROOT'] . "test" . DIRECTORY_SEPARATOR . "data" . DIRECTORY_SEPARATOR . "sample_missing.properties";
+		$good = $UBAR_GLOB['UBAR_ROOT'] . "test/data/sample.properties";
+
+		$pathToPropertiesClass = $UBAR_GLOB['UBAR_ROOT'] . "core" . DIRECTORY_SEPARATOR . "Properties.php";
 
 		$expectedMessage = "Path \"$bad\" to properties file does not exist. File: " . $pathToPropertiesClass . " on line: ";
 
@@ -29,8 +31,10 @@ class PropertiesTest extends UbarBaseTestCase {
 	}
 
 	function testGet() {
-		$path = UBAR_ROOT . "test" . DIRECTORY_SEPARATOR . "data" . DIRECTORY_SEPARATOR . "sample.properties";
-		$pathToPropertiesClass = UBAR_ROOT . "core" . DIRECTORY_SEPARATOR . "Properties.php";
+		global $UBAR_GLOB;
+
+		$path = $UBAR_GLOB['UBAR_ROOT'] . "test" . DIRECTORY_SEPARATOR . "data" . DIRECTORY_SEPARATOR . "sample.properties";
+		$pathToPropertiesClass = $UBAR_GLOB['UBAR_ROOT'] . "core" . DIRECTORY_SEPARATOR . "Properties.php";
 		$props = new Properties($path);
 
 		// test normal
@@ -68,8 +72,10 @@ class PropertiesTest extends UbarBaseTestCase {
 	}
 
 	function testGetBool() {
-		$path = UBAR_ROOT . "test" . DIRECTORY_SEPARATOR . "data" . DIRECTORY_SEPARATOR . "sample.properties";
-		$pathToPropertiesClass = UBAR_ROOT . "core" . DIRECTORY_SEPARATOR . "Properties.php";
+		global $UBAR_GLOB;
+
+		$path = $UBAR_GLOB['UBAR_ROOT'] . "test" . DIRECTORY_SEPARATOR . "data" . DIRECTORY_SEPARATOR . "sample.properties";
+		$pathToPropertiesClass = $UBAR_GLOB['UBAR_ROOT'] . "core" . DIRECTORY_SEPARATOR . "Properties.php";
 		$props = new Properties($path);
 
 		// test valid
@@ -87,8 +93,10 @@ class PropertiesTest extends UbarBaseTestCase {
 	}
 
 	function testDuplicate() {
-		$path = UBAR_ROOT . "test" . DIRECTORY_SEPARATOR . "data" . DIRECTORY_SEPARATOR . "sample.duplicate.properties";
-		$pathToPropertiesClass = UBAR_ROOT . "core" . DIRECTORY_SEPARATOR . "Properties.php";
+		global $UBAR_GLOB;
+
+		$path = $UBAR_GLOB['UBAR_ROOT'] . "test" . DIRECTORY_SEPARATOR . "data" . DIRECTORY_SEPARATOR . "sample.duplicate.properties";
+		$pathToPropertiesClass = $UBAR_GLOB['UBAR_ROOT'] . "core" . DIRECTORY_SEPARATOR . "Properties.php";
 		try {
 			$props = new Properties($path);
 			$this->fail("An exception for duplicate key should have been thrown.");
