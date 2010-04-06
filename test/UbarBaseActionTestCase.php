@@ -3,21 +3,73 @@
  * Base class for testing Actions or functionality that requires a setup context.
  * Note that a simulation of the config, controller, and views are nested in the test directory.
  */
+/**
+ * Class definition for UbarBaseActionTestCase
+ * @package core
+ */
+
+/**
+ * Test case for ubar action tests.
+ *
+ * The class should be used for writing phpunit tests for ubar action classes.
+ * It does the required setup to run an action in a test environment.
+ *
+ * These tests are written for PHPUnit version 3.4 under the assumption they
+ * will be run using an external configuration with eclipse and/or the Ant
+ * build script associated with this project.
+ *
+ * @link http://www.phpunit.de/manual/3.4/en/index.html Documentation
+ * @link Setup: http://www.phpunit.de/wiki/Eclipse Eclipse
+ * @link http://www.phpunit.de/manual/3.4/en/api.html#api.assert Valid Assertions
+ *
+ * @author		Joshua A. Ganderson <jag@josh.com>
+ * @link		http://www.holisticmonkey.com/Framework.action
+ * @copyright	Copyright (c) 2010, Joshua A. Ganderson
+ * @license		http://www.gnu.org/licenses/gpl.html GNU General Public License v3
+ * @package		core
+ * @subpackage	test
+ */
 require_once("UbarBaseTestCase.php");
 abstract class UbarBaseActionTestCase extends UbarBaseTestCase {
 
+	/**
+	 * @var class Instance of dispatcher
+	 */
 	protected $dispatcher;
 
+	/**
+	 * @var class Instance of action definition
+	 */
 	protected $actionDef;
 
+	/**
+	 * @var class Instance of action
+	 */
 	protected $action;
 
+	/**
+	 * @var string Result string returned by action
+	 */
 	protected $resultString;
 
+	/**
+	 * @var class Result definition for given result string and action def
+	 */
 	protected $resultDef;
 
+	/**
+	 * @var array A copy of errors, warnings, notices so that it can be
+	 * confirmed that all messages were tested for without atually removing
+	 * them from the action instance.
+	 */
 	protected $messagesCopy = array();
 
+	/**
+	 * Do the required setup to run an action. Allows for an alternate
+	 * location for action config file.
+	 *
+	 * @param string Path to overriding action configuration
+	 */
 	public function __construct($xmlOverride = null) {
 		global $UBAR_GLOB;
 
@@ -39,8 +91,16 @@ abstract class UbarBaseActionTestCase extends UbarBaseTestCase {
 		}
 	}
 
-	// users may want to set more $_SERVER properties, see
-	// http://php.net/manual/en/reserved.variables.server.php
+	/**
+	 * Initialize the action that matches the provided action name.
+	 * Note that this sets the $_SERVER param for REQUEST_URI to simulate
+	 * the appropriate request being made. Other properties may need to be
+	 * set in the future.
+	 *
+	 * @link http://php.net/manual/en/reserved.variables.server.php $_SERVER Properties
+	 *
+	 * @param string $actionString The name of the action to initialize.
+	 */
 	final protected function initAction($actionString) {
 		// set up commonly referenced properties by views and templates
 		$_SESSION = array();
@@ -53,7 +113,12 @@ abstract class UbarBaseActionTestCase extends UbarBaseTestCase {
 		$this->actionDef = $this->action->getActionDef();
 	}
 
-	// note that need to use setUserInput first
+	/**
+	 * Run the action. Note that setUserInput() must be called prior to this
+	 * if your action requires user input.
+	 *
+	 * @see UbarBaseActionTestCase::setUserInput()
+	 */
 	final protected function runAction() {
 		// execute action, note that body may not execute if user conditions not met
 		$this->resultString = $this->dispatcher->generateResult();
@@ -68,15 +133,33 @@ abstract class UbarBaseActionTestCase extends UbarBaseTestCase {
 		$this->messagesCopy[Action::NOTICES_KEY] = $this->action->getMessages(Action::NOTICES_KEY);
 	}
 
-	// note that don't always need this, mostly for confirmation that rendering process didn't produce exceptions
+	/**
+	 * Assert that no exceptions were thrown during the render process. This
+	 * will test for items in the template and view that are otherwise not
+	 * tested during this process. It is not necessary that this be called for
+	 * every action but it is helpful in views that have a large amount of code.
+	 *
+	 * Note that this will output the page contents to console.
+	 */
 	final protected function assertRenderValid() {
 		$this->dispatcher->showResult();
 	}
 
+	/**
+	 * Set user input simulating GET or POST params.
+	 *
+	 * @param string $key Input name
+	 * @param mixed  $val Input value, may sometimes be an array
+	 */
 	final protected function setUserInput($key, $val) {
 		$this->action->set($key, $val);
 	}
 
+	/**
+	 * Clear values between tests.
+	 *
+	 * @todo Determine if this, or more, is necessary with recent code changes
+	 */
 	final protected function tearDown() {
 		unset($this->actionDef);
 		unset($this->action);

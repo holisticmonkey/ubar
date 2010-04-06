@@ -80,8 +80,6 @@ $comments = get("comments");
 		<div class="contents"><?php echo $comment->getMessage() ?></div>
 	<?php } ?>
 
-
-
 	<div id="comments">
 		<form action="PostBlogComment.action" method="post">
 			<?php
