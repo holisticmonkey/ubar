@@ -244,16 +244,31 @@ if ($UBAR_GLOB['DB_USE']) {
 
 # CONFIGURE APPLICATION BASED ON PROPERTIES
 
-# SET HTML IN ERRORS
+/**
+ * Set whether html errors is on.
+ */
 ini_set('html_errors', $UBAR_GLOB['HTML_ERRORS'] ? GLobalConstants :: INI_OFF : GLobalConstants :: INI_ON);
 
-# CONFIGURE ERROR DISPLAY
+/**
+ * Set whether errors are displayed or not.
+ */
 ini_set('display_errors', ($UBAR_GLOB['DEV_MODE'] || $UBAR_GLOB['DISPLAY_ERRORS']) ? GLobalConstants :: INI_ON : GLobalConstants :: INI_OFF);
-// TODO: current properties values won't work since they refer to php constants, switch to int values
-// see http://www.php.net/manual/en/errorfunc.configuration.php#ini.error-reporting
+
+/**
+ * Set error reporting level. Note that values in the properties file are not
+ * used at this time since they return string values.
+ *
+ * @todo Use values from properties, either with ints or converting to ints.
+ * @link http://www.php.net/manual/en/errorfunc.configuration.php#ini.error-reporting Error Reporting
+ */
 ini_set('error_reporting', E_ALL | E_STRICT);
 
-# SET CUSTOM ERROR HANDLERS
+/**
+ * Set custom error handlers. Currently there are no provisions for user
+ * override.
+ *
+ * @todo Investigate all error conditions.
+ */
 if (function_exists("errorHandler")) {
 	set_error_handler("errorHandler", E_ALL | E_STRICT);
 }
@@ -261,45 +276,45 @@ if (function_exists("exceptionHandler")) {
 	set_exception_handler("exceptionHandler");
 }
 
-# SET CACHE RELATED HEADERS (pending)
+/**
+ * @todo Set cache headers here.
+ */
 
-# SET CONDITIONAL HEADERS FOR XHTML
+/**
+ * Set contitional headers for the use of xhtml. Note that these headers will
+ * not be used if it is not supported.
+ */
 $contentType = "text/html";
 if ($UBAR_GLOB['USE_XHTML'] && stristr($_SERVER["HTTP_ACCEPT"], "application/xhtml+xml")) {
 	$contentType = 'application/xhtml+xml';
 }
 header("Content-Type: $contentType;charset=" . $UBAR_GLOB['CHARSET']);
 
-# set session lifetime
+/**
+ * Set session lifetime.
+ */
 ini_set('session.gc_maxlifetime', $UBAR_GLOB['SESSION_LIFETIME']);
 
-# start session
+/**
+ * Initialize the session. It may be that this needs to occur prior to this.
+ */
 session_start();
 
-# set timezone
-// get from user if present and set
-// default if no value or value from user not valid
-// TODO: consider moving this to controller and allowing project to override?
+/**
+ * Set the timezone.
+ */
 if (isset($UBAR_GLOB['TIMEZONE_DEFAULT'])) {
 	date_default_timezone_set($UBAR_GLOB['TIMEZONE_DEFAULT']);
 }
 
-# set locale
-// TODO: consider moving this to controller and allowing project to override?
-// $_SERVER['HTTP_ACCEPT_LANGUAGE']
-// get from user if present and set
-// else get from cookie if present
-// else get from headers if something useful set
-// default if no value or value from user not valid<br />
-
-//http://us.php.net/setlocale
-// temp assignment of locale to default for dev purposes
+/**
+ * Set the locale. Note that this has limited impact on message formatting at
+ * this time. It will however influence a variety of framework elements
+ * in the future.
+ *
+ * @link http://us.php.net/setlocale Locale Info
+ */
 $localeNameArray = $UBAR_GLOB['LOCALE_DEFAULT'];
-// TODO: should I put a fallback here?
-// ex $loc_de = setlocale(LC_ALL, 'de_DE@euro', 'de_DE', 'de', 'ge');
-// set locale and retrieve locale string
-//TODO: strip whitespace before doing explode
 $currentLocale = setlocale(LC_ALL, explode(",", $localeNameArray));
-// set locale string to a constant to be used by property and resource retrieval
 $UBAR_GLOB['LOCALE'] = $currentLocale;
 ?>

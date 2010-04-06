@@ -25,6 +25,7 @@
 	<target name="test" description="Run all phpunit tests">
 		<echo>Running PHPUnit tests</echo>
 		
+		<delete dir="${logs.dir}" />
 		<mkdir dir="${logs.dir}" />
 		
 		<exec dir="${test.dir}" executable="phpunit.bat" failonerror="true">
@@ -82,7 +83,7 @@
 		<echo>=== Generating documentation with phpDocumentor for Ubar version ${framework.version} ===</echo>
 
 		<!-- clear out old docs -->
-		<delete dir="${docs.output.dir}" />
+		<delete failonerror="true" dir="${docs.output.dir}" />
 		<mkdir dir="${docs.output.dir}" />
 		
 		<!-- generate html docs for hosting -->
@@ -95,7 +96,7 @@
 			<arg value="--directory" />
 			<arg value="${basedir}" />
 			<arg value="--ignore" />
-			<arg value="${basedir}/test/core/*,${basedir}/test/data/*,${basedir}/test/sample/*,${basedir}/sample/*,${basedir}/dist/*,${basedir}/test/UbarAllTests.php" />
+			<arg value="${basedir}/test/core/*,${basedir}/test/data/*,${basedir}/test/sample/*,${basedir}/sample/*,${basedir}/dist/*,${basedir}/build/*,${basedir}/test/UbarAllTests.php" />
 			<arg value="--title" />
 			<arg value="Ubar PHP MVC Framework Documentation" />
 			<arg value="--parseprivate" />
