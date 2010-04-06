@@ -261,8 +261,7 @@ if (function_exists("exceptionHandler")) {
 	set_exception_handler("exceptionHandler");
 }
 
-
-# SET CACHE RELATED HEADERS
+# SET CACHE RELATED HEADERS (pending)
 
 # SET CONDITIONAL HEADERS FOR XHTML
 $contentType = "text/html";
@@ -276,24 +275,6 @@ ini_set('session.gc_maxlifetime', $UBAR_GLOB['SESSION_LIFETIME']);
 
 # start session
 session_start();
-
-
-// TODO: store permissions object in session? have things that invalidate it flush it?
-// TODO: drop this and have UserManager that gets called in dispatcher to determine if should return GlobalConstants::PERMISSION_DENIED?
-// TODO: have base action call to get user props and have isAdmin() on it so can display more info on page if admin...
-# if user, get them and init user object
-if(isset($_SESSION['userid'])) {
-	// TODO: replace this query with a call to query provider
-	$query = "SELECT * FROM users WHERE userid=" . $_SESSION['userid'];
-	if(!$result = mysql_query($query)){
-		//addError("Error running query: " . mysql_error());
-	}
-	// init User object using id, class knows what queries to run to populate self. throws InvalidUserError if not found
-}
-
-# determine if user allowed to see this page, redirect if not
-// if page requires user and user not logged in - fail
-// if page requires admin and user not admin - fail
 
 # set timezone
 // get from user if present and set
