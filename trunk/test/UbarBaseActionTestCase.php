@@ -1,12 +1,13 @@
 <?php
 /**
- * Base class for testing Actions or functionality that requires a setup context.
- * Note that a simulation of the config, controller, and views are nested in the test directory.
- */
-/**
  * Class definition for UbarBaseActionTestCase
  * @package core
  */
+
+/**
+ * require parent class
+ */
+ require_once("UbarBaseTestCase.php");
 
 /**
  * Test case for ubar action tests.
@@ -29,7 +30,6 @@
  * @package		core
  * @subpackage	test
  */
-require_once("UbarBaseTestCase.php");
 abstract class UbarBaseActionTestCase extends UbarBaseTestCase {
 
 	/**
@@ -75,6 +75,9 @@ abstract class UbarBaseActionTestCase extends UbarBaseTestCase {
 
 		// construct UbarBaseTestCase first since it does most of the setup
 		parent::__construct();
+
+		// seet HTTP_ACCEPT as it is used in init script
+		$_SERVER['HTTP_ACCEPT'] = "text / html, application / xhtml + xml, application / xml; ,*/*; q = 0.9 q = 0.8";
 
 		// do the setup required for action context material
 		require_once ($UBAR_GLOB['UBAR_ROOT'] . "/init.php");
@@ -167,69 +170,180 @@ abstract class UbarBaseActionTestCase extends UbarBaseTestCase {
 		unset($this->resultDef);
 	}
 
-	// TODO: add helper methods for asserting has error, warning, info
-	// '' title, path, etc
-
-	// CUSTOM ASSERTIONS - either to indicate what should be tested on each
-	// action or to facilitate some of the more fragile things to test. For
-	// instance, testing
-
+	/**
+	 * Assert that the title is equal to the given value. Note that this checks
+	 * against the rendered value in the action so, if a value for title key
+	 * was provided, it will return the retrieved value from the properties
+	 * file.
+	 *
+	 * @param string $title Title to test against.
+	 */
 	final protected function assertTitleEquals($title) {
 		$this->assertEquals($title, $this->action->getTitle());
 	}
 
+	/**
+	 * Assert that the section equals the given value.
+	 *
+	 * @param string $section Section to check against.
+	 */
 	final protected function assertSectionEquals($section) {
 		$this->assertEquals($section, $this->action->getSection());
 	}
 
+	/**
+	 * Assert that the sub section equals the given value.
+	 *
+	 * @param string @subsection Sub section to check against.
+	 */
 	final protected function assertSubsectionEquals($subsection) {
 		$this->assertEquals($subsection, $this->action->getSubsection());
 	}
 
+	/**
+	 * Assert that the action classname equals the given value.
+	 *
+	 * @param string @actionClass Class name to check against.
+	 */
 	final protected function assertActionClassEquals($actionClass) {
 		$this->assertEquals($actionClass, getActionClassName());
 	}
 
+	/**
+	 * Assert that the action name equals the given value.
+	 *
+	 * @param string $name Action name to check against.
+	 */
 	final protected function assertActionNameEquals($name) {
 		$this->assertEquals($name, getActionName());
 	}
 
+	/**
+	 * Assert that the action location equals the given value.
+	 *
+	 * @param string $location Location of view file to check against.
+	 */
 	final protected function assertViewEquals($location) {
 		$this->assertEquals($location, $this->actionDef->getViewLocation());
 	}
 
+	/**
+	 * Assert that the result string equals the given value.
+	 *
+	 * @param string $result Result string to check against.
+	 */
 	final protected function assertResultEquals($result) {
 		$this->assertEquals($result, $this->resultString);
 	}
 
+	/**
+	 * Assert that the result type equals the given value.
+	 *
+	 * @param string $type Result type to check against.
+	 */
 	final protected function assertResultTypeEquals($type) {
 		$this->assertEquals($type, $this->resultDef->getType());
 	}
 
+	/**
+	 * Assert that the given error exists.
+	 *
+	 * Note that this removes the error from a copy of the message list. This
+	 * is used for checking that all messages have been checked for a given
+	 * action.
+	 *
+	 * @param string $messagekey Message key for the error.
+	 * @param mixed $arguments Arguments for the error.
+	 * @param string $fieldName Input field associated with the error.
+	 */
 	final protected function assertHasError($messageKey, array $arguments = array (), $fieldName = null) {
 		$this->assertHasMessage(Action::ERRORS_KEY, $messageKey, $arguments, $fieldName);
 	}
 
+	/**
+	 * Assert that a given error exists.
+	 *
+	 * Note that this removes the error from a copy of the message list. This
+	 * is used for checking that all messages have been checked for a given
+	 * action.
+	 *
+	 * @param string $message Message to check against.
+	 * @param string $fieldName Input field associated with the error.
+	 */
 	final protected function assertHasErrorSimple($message, $fieldName = null) {
 		$this->assertHasMessageSimple(Action::ERRORS_KEY, $message, $fieldName);
 	}
 
+	/**
+	 * Assert that the given warning exists.
+	 *
+	 * Note that this removes the warning from a copy of the message list. This
+	 * is used for checking that all messages have been checked for a given
+	 * action.
+	 *
+	 * @param string $messagekey Message key for the warning.
+	 * @param mixed $arguments Arguments for the warning.
+	 * @param string $fieldName Input field associated with the warning.
+	 */
 	final protected function assertHasWarning($messageKey, array $arguments = array (), $fieldName = null) {
 		$this->assertHasMessage(Action::WARNINGS_KEY, $messageKey, $arguments, $fieldName);
 	}
 
+	/**
+	 * Assert that a given warning exists.
+	 *
+	 * Note that this removes the warning from a copy of the message list. This
+	 * is used for checking that all messages have been checked for a given
+	 * action.
+	 *
+	 * @param string $message Message to check against.
+	 * @param string $fieldName Input field associated with the warning.
+	 */
 	final protected function assertHasWarningSimple($message, $fieldName = null) {
 		$this->assertHasMessageSimple(Action::WARNINGS_KEY, $message, $fieldName);
 	}
 
+	/**
+	 * Assert that the given notice exists.
+	 *
+	 * Note that this removes the notice from a copy of the message list. This
+	 * is used for checking that all messages have been checked for a given
+	 * action.
+	 *
+	 * @param string $messagekey Message key for the notice.
+	 * @param mixed $arguments Arguments for the notice.
+	 * @param string $fieldName Input field associated with the notice.
+	 */
 	final protected function assertHasNotice($messageKey, array $arguments = array (), $fieldName = null) {
 		$this->assertHasMessage(Action::NOTICES_KEY, $messageKey, $arguments, $fieldName);
 	}
 
+	/**
+	 * Assert that a given notice exists.
+	 *
+	 * Note that this removes the notice from a copy of the message list. This
+	 * is used for checking that all messages have been checked for a given
+	 * action.
+	 *
+	 * @param string $message Message to check against.
+	 * @param string $fieldName Input field associated with the notice.
+	 */
 	final protected function assertHasNoticeSimple($message, $fieldName = null) {
 		$this->assertHasMessageSimple(Action::NOTICES_KEY, $message, $fieldName);
 	}
 
+	/**
+	 * Assert that the given message exists.
+	 *
+	 * Note that this removes the message from a copy of the message list. This
+	 * is used for checking that all messages have been checked for a given
+	 * action.
+	 *
+	 * @param string $type Message type.
+	 * @param string $messagekey Message key for the message.
+	 * @param mixed $arguments Arguments for the message.
+	 * @param string $fieldName Input field associated with the message.
+	 */
 	final private function assertHasMessage($type, $messageKey, array $arguments = array (), $fieldName = null) {
 		// create a message string with the given params
 		$messageString = $this->action->getProperties()->get($messageKey, $arguments);
@@ -237,7 +351,17 @@ abstract class UbarBaseActionTestCase extends UbarBaseTestCase {
 		$this->assertHasMessageSimple($type, $messageString, $fieldName);
 	}
 
-	// TODO: pull out found message from copy of messages
+	/**
+	 * Assert that a given message exists.
+	 *
+	 * Note that this removes the message from a copy of the message list. This
+	 * is used for checking that all messages have been checked for a given
+	 * action.
+	 *
+	 * @param string $type Message type.
+	 * @param string $message Message to check against.
+	 * @param string $fieldName Input field associated with the notice.
+	 */
 	final private function assertHasMessageSimple($type, $messageString, $fieldName = null) {
 		// create a message object with the message and field
 		$message = new Message($messageString, $fieldName);
@@ -258,11 +382,12 @@ abstract class UbarBaseActionTestCase extends UbarBaseTestCase {
 		$this->fail('Unable to find a message of type, ' . $type . ', with the message string, "' . $messageString . '" and field, "' . $fieldName . '".');
 	}
 
-	// each message assertion removes item from duplicate list when found, this
-	// tests that all messages have been removed (ie tested in an assertion)
-	// when called at the end of your test.
-	// TODO: consider putting this in the teardown but using an annotation or
-	// explicit ignore call to ignore it.
+	/**
+	 * Assert that every message associated with an action has been checked
+	 * with a message assertion. If this assertion is used, you must check
+	 * each message with assertHasError(), assertHasWarning(), or
+	 * assertHasNotice().
+	 */
 	final protected function assertAllMessagesTested() {
 		$count = 0;
 		$count += count($this->messagesCopy[Action::ERRORS_KEY]);
