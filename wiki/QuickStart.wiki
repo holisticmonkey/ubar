@@ -29,7 +29,7 @@ Suggestions:
  * Eclipse with phpeclipse is an ideal development environment.
  
 INSTALLATION
- # Set up the following folder structure, items marked with '*' are optional:
+ # Set up the following folder structure, items marked with '`*`' are optional:
 {{{
 [web] (or [html] as is common in some hosting facilities)
 	[css]*
