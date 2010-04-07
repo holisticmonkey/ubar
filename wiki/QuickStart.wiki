@@ -7,7 +7,7 @@ can be found at the following locations:
 
 == Resources ==
 
- * [http://www.holisticmonkey.com/Framework.action Project Page]
+ * [http://www.holisticmonkey.com/Framework.action Project Details]
  * [http://www.holisticmonkey.com/FrameworkDocs.action Docs]
  * [http://code.google.com/p/ubar/w/list Wiki]
  * [http://code.google.com/p/ubar/source/checkout Source]
