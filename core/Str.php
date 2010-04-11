@@ -127,12 +127,17 @@ class Str {
 	 * @todo Add support for user defined acceptable tags.
 	 * @todo Autolink urls and email addresses?
 	 * @todo Auto-obfuscate email addresses to prevent harvesting?
+	 * @todo Convert entities that will not work in xhtml such as an e with an accent mark.
+	 * @todo Strip unclosed or improperly nested tags.
 	 */
 	public static function sanitizeHTML($message) {
 		// strip slashes if necessary
 		if (get_magic_quotes_gpc()) {
 			$message = stripslashes($message);
 		}
+
+		// strip out non-ascii chars
+		$message = self::stripNonASCII($message);
 
 		// strip all but allowed tags
 		$message = strip_tags($message, '<a><img><b><strong><i><em><u><ul><ol><li>');
@@ -188,6 +193,10 @@ class Str {
 	 */
 	public static function stripNewLines($string) {
 		return rtrim($string, "\r\n");
+	}
+
+	public static function stripNonASCII($string) {
+		return preg_replace('/[^(\x20-\x7F)]*/','', $string);
 	}
 }
 ?>

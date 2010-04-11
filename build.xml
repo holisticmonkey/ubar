@@ -120,6 +120,7 @@
 				<exclude name="${config.name}*"/>
 				<exclude name="${actiondefs.name}*"/>
 				<exclude name="README"/>
+				<exclude name="core.html"/>
 			</fileset>
 		</copy>
 		

@@ -881,6 +881,21 @@ abstract class Action {
 	}
 
 	/**
+	 * Set title override.
+	 *
+	 * Note this should only be used when you have a dynamically generated
+	 * title. For instance, if you are displaying a blog post, the title of the
+	 * specific blog is often included in the page title. This is only
+	 * accessible in the action after having retrieved the post from the
+	 * database.
+	 *
+	 * $param string $title Title you want to use as an override.
+	 */
+	 public final function setTitle($title) {
+	 	$this->title = $title;
+	 }
+
+	/**
 	 * Get page name, this is the name property of your action definition.
 	 *
 	 * NOTE: This is primarily used for navigation highlighting in templates or
