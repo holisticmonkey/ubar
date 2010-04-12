@@ -1,4 +1,5 @@
 #summary Ubar Introduction.
+#sidebar TableOfContents
 
 = Introduction =
 
