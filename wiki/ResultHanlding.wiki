@@ -1,4 +1,5 @@
 #summary Result Handling.
+#sidebar TableOfContents
 
 = Introduction =
 
