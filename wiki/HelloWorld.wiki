@@ -1,5 +1,6 @@
 #summary A simple "hello world" example using the ubar framework.
 #labels Phase-Implementation
+#sidebar TableOfContents
 
 = Introduction =
 
@@ -86,7 +87,5 @@ class HelloWorld extends Action {
 <action name="HelloWorld" path="HelloWorld" view="pages.helloWorld" />
 }}}
   # Request http://localhost/HelloWorld.action in your browser and confirm that you see the text, "Hello World"
-
-
 
 
