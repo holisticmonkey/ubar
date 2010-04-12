@@ -1,4 +1,5 @@
 #summary The getting started guide for the framework.
+#sidebar TableOfContents
 
 = Introduction =
 
