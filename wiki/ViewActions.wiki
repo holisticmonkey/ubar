@@ -1,4 +1,5 @@
 #summary Description of actions configured for views.
+#sidebar TableOfContents
 
 = Introduction =
 
