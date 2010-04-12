@@ -1,4 +1,5 @@
 #summary Action message usage.
+#sidebar TableOfContents
 
 = Introduction =
 
