@@ -196,7 +196,7 @@ class Str {
 	}
 
 	public static function stripNonASCII($string) {
-		return preg_replace('/[^(\x20-\x7F)]*/','', $string);
+		return preg_replace('/[^\x0A\x0D\x20-\x7F]*/','', $string);
 	}
 }
 ?>

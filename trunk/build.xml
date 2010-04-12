@@ -121,6 +121,7 @@
 				<exclude name="${actiondefs.name}*"/>
 				<exclude name="README"/>
 				<exclude name="core.html"/>
+				<exclude name="build.xml"/>
 			</fileset>
 		</copy>
 		

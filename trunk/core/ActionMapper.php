@@ -81,7 +81,9 @@ class ActionMapper {
 		$this->defaultActionName = (string) $actionDefsXML->defaultAction['name'];
 
 		// get the name of the default action
-		$this->dummyActionPath = FileUtils::dotToPath((string) $actionDefsXML->dummyAction['path']);
+		if(!is_null($actionDefsXML->dummyAction['path'])) {
+			$this->dummyActionPath = FileUtils::dotToPath((string) $actionDefsXML->dummyAction['path']);
+		}
 
 		// assign actions as a local variable
 		$this->actions = $actionDefsXML->actions->action;

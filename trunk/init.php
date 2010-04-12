@@ -317,4 +317,9 @@ if (isset($UBAR_GLOB['TIMEZONE_DEFAULT'])) {
 $localeNameArray = $UBAR_GLOB['LOCALE_DEFAULT'];
 $currentLocale = setlocale(LC_ALL, explode(",", $localeNameArray));
 $UBAR_GLOB['LOCALE'] = $currentLocale;
+
+/**
+ * Allow gzip compression
+ */
+ini_set('zlib.output_compression', 1);
 ?>
