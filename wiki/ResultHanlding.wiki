@@ -1,0 +1,5 @@
+#summary Result Handling.
+
+= Introduction =
+
+STUB - How result evaluation works.
