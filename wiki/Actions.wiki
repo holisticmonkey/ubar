@@ -1,5 +1,6 @@
 #summary A breakdown of the role of actions and the primary categories of use.
 #labels Phase-Implementation
+#sidebar TableOfContents
 
 = Introduction =
 
