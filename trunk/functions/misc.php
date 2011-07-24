@@ -29,7 +29,7 @@
  * see - http://www.php.net/manual/en/function.spl-autoload.php
  *
  */
-function __autoload($className) {
+function autoload($className) {
 	global $classes;
 	$filename = $className . ".php";
 	if (isset($classes[$filename])) {
@@ -41,6 +41,7 @@ function __autoload($className) {
 		// log that failed to find class through auto-loading
 	}
 }
+spl_autoload_register('autoload');
 
 /**
  * Assign folders as search locations for class autoloading.
