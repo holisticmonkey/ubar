@@ -43,14 +43,14 @@
 		<mkdir dir="${sample.dir}" />
 		
 		<!-- copy sample content over -->
-		<copy todir="${sample.dir}">
+		<copy todir="${sample.dir}" preservelastmodified="true">
 			<fileset dir="${basedir}/sample/">
 				<exclude name="config/"/>
 			</fileset>
 		</copy>
 		
 		<!-- install framework into ignored lib folder of sample application -->
-		<copy todir="${sample.dir}/WEB-INF/lib/ubar">
+		<copy todir="${sample.dir}/WEB-INF/lib/ubar" preservelastmodified="true">
 			<fileset dir="${lib.build.dir}">
 				<exclude name="install/"/>
 				<exclude name="ubar_config.properties"/>
@@ -59,13 +59,13 @@
 		</copy>
 		
 		<!-- install elements from install directory -->
-		<copy todir="${sample.dir}/web/">
+		<copy todir="${sample.dir}/web/" preservelastmodified="true">
 			<fileset dir="${lib.build.dir}/install">
 			</fileset>
 		</copy>
 		
 		<!-- copy sample config and action config -->
-		<copy todir="${sample.dir}/WEB-INF/lib/ubar">
+		<copy todir="${sample.dir}/WEB-INF/lib/ubar" preservelastmodified="true">
 			<fileset dir="${basedir}/sample/config">
 			</fileset>
 		</copy>
@@ -101,15 +101,30 @@
 			<arg value="Ubar PHP MVC Framework Documentation" />
 			<arg value="--parseprivate" />
 		</exec>
+		
+		<!-- fix bad links -->
+		<echo>=== Manually fixing broken documentation internal links ===</echo>
+		<replaceregexp>
+			<regexp pattern='Located in &lt;a class="field" href="(.+)"&gt;(.+)&lt;/a&gt;' />
+			<substitution expression='Located in &lt;a class="field" href="../\1"&gt;\2&lt;/a&gt;' />
+
+			<fileset dir="${docs.output.dir}">
+				<include name="core/constants/*" />
+				<include name="core/containers/*" />
+				<include name="core/exceptions/*" />
+				<include name="core/test/*" />
+				<include name="core/utils/*" />
+			</fileset>
+		</replaceregexp>
 	</target>
-	
+
 	<target name="build-source" description="Package source files">
 		<!-- re-init lib build dir -->
 		<delete dir="${lib.build.dir}" />
 		<mkdir dir="${lib.build.dir}" />
 		
 		<!-- copy files over -->
-		<copy todir="${lib.build.dir}">
+		<copy todir="${lib.build.dir}" preservelastmodified="true">
 			<fileset dir="${basedir}">
 				<exclude name="dist/"/>
 				<exclude name="build/"/>
@@ -126,13 +141,13 @@
 		</copy>
 		
 		<!-- copy test files developers will want to use to test their app -->
-		<copy file="${test.dir}/UbarBaseActionTestCase.php" tofile="${lib.build.dir}/test/UbarBaseActionTestCase.php"/>
-		<copy file="${test.dir}/UbarBaseTestCase.php" tofile="${lib.build.dir}/test/UbarBaseTestCase.php"/>
-		<copy file="${test.dir}/UbarTestSuite.php" tofile="${lib.build.dir}/test/UbarTestSuite.php"/>
+		<copy file="${test.dir}/UbarBaseActionTestCase.php" tofile="${lib.build.dir}/test/UbarBaseActionTestCase.php" preservelastmodified="true" />
+		<copy file="${test.dir}/UbarBaseTestCase.php" tofile="${lib.build.dir}/test/UbarBaseTestCase.php" preservelastmodified="true" />
+		<copy file="${test.dir}/UbarTestSuite.php" tofile="${lib.build.dir}/test/UbarTestSuite.php" preservelastmodified="true" />
 
 		<!-- copy .in files to build directory for inclusion in archive -->
-		<copy file="${config.name}.in" tofile="${lib.build.dir}/${config.name}"/>
-		<copy file="${actiondefs.name}.in" tofile="${lib.build.dir}/${actiondefs.name}"/>
+		<copy file="${config.name}.in" tofile="${lib.build.dir}/${config.name}" preservelastmodified="true" />
+		<copy file="${actiondefs.name}.in" tofile="${lib.build.dir}/${actiondefs.name}" preservelastmodified="true" />
 	</target>
 	
 	<target name="package" description="Package project for distribution" depends="test,generate-docs,build-source,build-sample">
@@ -140,7 +155,7 @@
 		<delete failonerror="false" file="${dist.dir}/${package.name}" />
 		
 		<!-- copy README to root instead of being in lib -->
-		<copy file="${basedir}/README" tofile="${build.dir}/README"/>
+		<copy file="${basedir}/README" tofile="${build.dir}/README" preservelastmodified="true" />
 
 		<!-- zip contents of build dir -->
 		<zip
