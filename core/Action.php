@@ -100,6 +100,11 @@ abstract class Action
     public $title;
 
     /**
+     * @var string Description of the page, if any.
+     */
+    public $description;
+
+    /**
      * @var string Page name, same as name property in action definition.
      */
     public $page;
@@ -302,6 +307,12 @@ abstract class Action
             {
                 global $action;
                 return $action->title;
+            }
+
+            function getDescription()
+            {
+            	global $action;
+            	return $action->description;
             }
 
             function getPage()
@@ -983,10 +994,28 @@ abstract class Action
      *
      * $param string $title Title you want to use as an override.
      */
-     public final function setTitle($title)
-     {
-         $this->title = $title;
-     }
+    public final function setTitle($title)
+    {
+        $this->title = $title;
+    }
+
+    /**
+     * Get page description if any.
+     */
+    public final function getDescription()
+    {
+    	return $this->description;
+    }
+
+    /**
+     * Set the page description.
+     *
+     * $param string $description Description for use in meta tags.
+     */
+    public final function setDescription($description)
+    {
+    	$this->description = $description;
+    }
 
     /**
      * Get page name, this is the name property of your action definition.
